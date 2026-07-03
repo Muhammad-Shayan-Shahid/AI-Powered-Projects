@@ -1,0 +1,322 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
+
+.iv-root {
+  min-height: 100vh;
+  background: #030712;
+  padding-top: 64px;
+  font-family: 'DM Sans', sans-serif;
+  color: #f1f5f9;
+}
+
+.iv-bg {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(ellipse at 10% 30%, rgba(59,130,246,0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 90% 70%, rgba(139,92,246,0.05) 0%, transparent 40%);
+}
+
+.iv-container {
+  position: relative; z-index: 1;
+  max-width: 860px; margin: 0 auto;
+  padding: 40px 24px;
+}
+
+/* ── Top Bar ── */
+.iv-topbar {
+  display: flex; align-items: center;
+  justify-content: space-between; margin-bottom: 32px;
+}
+
+.iv-session-info { display: flex; align-items: center; gap: 12px; }
+
+.iv-badge {
+  padding: 5px 12px; border-radius: 8px; font-size: 12px; font-weight: 600;
+}
+.iv-badge-domain {
+  background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2); color: #60a5fa;
+}
+.iv-badge-diff-easy   { background: rgba(34,197,94,0.1);  border: 1px solid rgba(34,197,94,0.2);  color: #4ade80; }
+.iv-badge-diff-medium { background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.2); color: #fbbf24; }
+.iv-badge-diff-hard   { background: rgba(239,68,68,0.1);  border: 1px solid rgba(239,68,68,0.2);  color: #f87171; }
+
+.iv-counter {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px; font-weight: 600; color: #475569;
+}
+
+.iv-quit-btn {
+  padding: 7px 16px; border-radius: 8px;
+  border: 1px solid rgba(239,68,68,0.2);
+  background: rgba(239,68,68,0.05);
+  color: #f87171; font-size: 13px; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+}
+.iv-quit-btn:hover { background: rgba(239,68,68,0.1); }
+
+/* ── Progress ── */
+.iv-progress-wrap { margin-bottom: 32px; }
+.iv-progress-bar {
+  height: 4px; background: rgba(255,255,255,0.05);
+  border-radius: 2px; overflow: hidden;
+}
+.iv-progress-fill {
+  height: 100%; border-radius: 2px;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  transition: width 0.5s ease;
+}
+.iv-progress-label {
+  display: flex; justify-content: space-between;
+  margin-top: 8px; font-size: 11px; color: #334155;
+}
+
+/* ── Question Card ── */
+.iv-question-card {
+  background: rgba(15,23,36,0.9);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 20px; padding: 36px;
+  backdrop-filter: blur(20px);
+  margin-bottom: 20px;
+}
+
+.iv-q-header {
+  display: flex; align-items: center;
+  justify-content: space-between; margin-bottom: 24px;
+}
+.iv-q-num {
+  font-family: 'Syne', sans-serif;
+  font-size: 12px; font-weight: 600; color: #334155;
+  text-transform: uppercase; letter-spacing: 1px;
+}
+.iv-timer {
+  display: flex; align-items: center; gap: 6px;
+  font-family: 'Syne', sans-serif;
+  font-size: 14px; font-weight: 700; color: #475569;
+}
+.iv-timer-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #3b82f6; animation: ivPulse 1.5s ease infinite;
+}
+@keyframes ivPulse {
+  0%,100% { opacity: 1; } 50% { opacity: 0.3; }
+}
+
+.iv-question-text {
+  font-size: 18px; font-weight: 500; color: #f1f5f9;
+  line-height: 1.7; margin-bottom: 8px;
+}
+
+.iv-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; }
+.iv-tag {
+  padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 500;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  color: #475569;
+}
+
+/* ── Answer Area ── */
+.iv-answer-card {
+  background: rgba(15,23,36,0.9);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 20px; padding: 28px;
+  backdrop-filter: blur(20px);
+  margin-bottom: 20px;
+}
+
+.iv-answer-label {
+  font-size: 12px; font-weight: 600; color: #334155;
+  text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px;
+}
+
+.iv-textarea {
+  width: 100%; min-height: 160px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px; padding: 16px;
+  color: #f1f5f9; font-size: 14px; line-height: 1.7;
+  font-family: 'DM Sans', sans-serif;
+  resize: vertical; outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+.iv-textarea:focus { border-color: rgba(59,130,246,0.4); }
+.iv-textarea::placeholder { color: #334155; }
+
+.iv-char-count {
+  text-align: right; font-size: 11px; color: #334155; margin-top: 6px;
+}
+
+/* ── Submit Button ── */
+.iv-submit-btn {
+  width: 100%; padding: 16px; border-radius: 12px; border: none;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  color: white; font-size: 15px; font-weight: 700;
+  cursor: pointer; font-family: 'Syne', sans-serif;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  transition: opacity 0.2s, transform 0.15s;
+  box-shadow: 0 8px 24px rgba(59,130,246,0.2);
+}
+.iv-submit-btn:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); }
+.iv-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.iv-spinner {
+  width: 18px; height: 18px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white; border-radius: 50%;
+  animation: ivSpin 0.7s linear infinite;
+}
+@keyframes ivSpin { to { transform: rotate(360deg); } }
+
+/* ── Feedback Card ── */
+.iv-feedback-card {
+  border-radius: 20px; padding: 28px;
+  backdrop-filter: blur(20px);
+  margin-bottom: 20px; animation: ivFadeUp 0.4s ease forwards;
+}
+@keyframes ivFadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.iv-feedback-header {
+  display: flex; align-items: center;
+  justify-content: space-between; margin-bottom: 20px;
+}
+.iv-feedback-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 16px; font-weight: 700; color: #f1f5f9;
+}
+.iv-score-badge {
+  display: flex; align-items: baseline; gap: 3px;
+  font-family: 'Syne', sans-serif;
+}
+.iv-score-num  { font-size: 36px; font-weight: 800; }
+.iv-score-max  { font-size: 14px; color: #475569; }
+
+.iv-feedback-text {
+  font-size: 14px; color: #94a3b8; line-height: 1.7; margin-bottom: 20px;
+  padding: 16px; background: rgba(255,255,255,0.03);
+  border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);
+}
+
+.iv-keywords-row { display: flex; gap: 16px; margin-bottom: 20px; }
+.iv-keywords-col { flex: 1; }
+.iv-kw-title {
+  font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.5px; margin-bottom: 8px;
+}
+.iv-kw-title.covered { color: #22c55e; }
+.iv-kw-title.missed  { color: #ef4444; }
+
+.iv-kw-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.iv-kw-tag  {
+  padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 500;
+}
+.iv-kw-tag.covered { background: rgba(34,197,94,0.1);  border: 1px solid rgba(34,197,94,0.2);  color: #4ade80; }
+.iv-kw-tag.missed  { background: rgba(239,68,68,0.1);  border: 1px solid rgba(239,68,68,0.2);  color: #f87171; }
+
+.iv-confidence {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px; border-radius: 10px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.05);
+  margin-bottom: 20px;
+}
+.iv-conf-label { font-size: 13px; color: #475569; }
+.iv-conf-val   { font-size: 13px; font-weight: 600; }
+.iv-conf-low    { color: #f87171; }
+.iv-conf-medium { color: #fbbf24; }
+.iv-conf-high   { color: #4ade80; }
+
+/* Next button */
+.iv-next-btn {
+  width: 100%; padding: 15px; border-radius: 12px; border: none;
+  color: white; font-size: 15px; font-weight: 700;
+  cursor: pointer; font-family: 'Syne', sans-serif;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  transition: opacity 0.2s, transform 0.15s;
+}
+.iv-next-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+.iv-next-btn.next     { background: linear-gradient(135deg, #3b82f6, #8b5cf6); box-shadow: 0 8px 24px rgba(59,130,246,0.2); }
+.iv-next-btn.complete { background: linear-gradient(135deg, #22c55e, #16a34a); box-shadow: 0 8px 24px rgba(34,197,94,0.2); }
+
+/* ── No Session ── */
+.iv-no-session {
+  min-height: 80vh; display: flex;
+  align-items: center; justify-content: center;
+}
+.iv-no-session-box {
+  text-align: center; padding: 48px;
+  background: rgba(15,23,36,0.8);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 20px;
+}
+.iv-no-session-icon  { font-size: 48px; margin-bottom: 16px; }
+.iv-no-session-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 22px; font-weight: 700; color: #f1f5f9; margin-bottom: 8px;
+}
+.iv-no-session-sub   { font-size: 14px; color: #475569; margin-bottom: 24px; }
+.iv-no-session-btn {
+  padding: 12px 28px; border-radius: 10px; border: none;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  color: white; font-size: 14px; font-weight: 600;
+  cursor: pointer; font-family: 'Syne', sans-serif;
+}
+
+@media (max-width: 768px) {
+  .iv-container      { padding: 24px 16px; }
+ 
+  /* Top bar — wrap badges on small screens */
+  .iv-topbar         { flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
+  .iv-session-info   { flex-wrap: wrap; gap: 8px; }
+  .iv-quit-btn       { padding: 6px 12px; font-size: 12px; }
+ 
+  /* Question card */
+  .iv-question-card  { padding: 24px; border-radius: 16px; }
+  .iv-question-text  { font-size: 16px; }
+ 
+  /* Answer card */
+  .iv-answer-card    { padding: 20px; border-radius: 16px; }
+  .iv-textarea       { min-height: 140px; font-size: 14px; }
+ 
+  /* Feedback card */
+  .iv-feedback-card  { padding: 20px; border-radius: 16px; }
+  .iv-score-num      { font-size: 28px; }
+ 
+  /* Keywords side by side still fine at 768 */
+}
+ 
+/* Mobile — 480px */
+@media (max-width: 480px) {
+  .iv-container      { padding: 16px 12px; }
+ 
+  /* Top bar */
+  .iv-badge          { padding: 4px 10px; font-size: 11px; }
+  .iv-counter        { font-size: 12px; }
+ 
+  /* Question card */
+  .iv-question-card  { padding: 18px; border-radius: 14px; margin-bottom: 14px; }
+  .iv-question-text  { font-size: 15px; line-height: 1.6; }
+  .iv-q-header       { margin-bottom: 16px; }
+ 
+  /* Answer card */
+  .iv-answer-card    { padding: 16px; border-radius: 14px; margin-bottom: 14px; }
+  .iv-textarea       { min-height: 120px; padding: 12px; font-size: 16px; } /* 16px stops iOS zoom */
+ 
+  /* Feedback card */
+  .iv-feedback-card  { padding: 16px; border-radius: 14px; }
+  .iv-feedback-title { font-size: 14px; }
+  .iv-score-num      { font-size: 26px; }
+  .iv-feedback-text  { font-size: 13px; padding: 12px; margin-bottom: 14px; }
+ 
+  /* Keywords — stack vertically on mobile */
+  .iv-keywords-row   { flex-direction: column; gap: 14px; margin-bottom: 14px; }
+ 
+  /* Buttons */
+  .iv-submit-btn     { padding: 14px; font-size: 14px; }
+  .iv-next-btn       { padding: 13px; font-size: 14px; }
+ 
+  /* No session box */
+  .iv-no-session-box { padding: 32px 20px; }
+  .iv-no-session-title { font-size: 18px; }
+}
