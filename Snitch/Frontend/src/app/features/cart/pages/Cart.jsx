@@ -4,8 +4,8 @@ import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { useCart } from '../hook/useCart';
 
-const formatCurrency = (amount, currency = 'PKR') =>
-    new Intl.NumberFormat('en-PK', {
+const formatCurrency = (amount, currency = 'USD') =>
+    new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency,
         maximumFractionDigits: 0,
