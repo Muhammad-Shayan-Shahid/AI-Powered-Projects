@@ -8,8 +8,8 @@ import { useAuth } from '../../auth/hook/useAuth';
 
 const CATEGORY_OPTIONS = ['all', 'shirts', 'pants', 'caps', 'hoodies', 'shoes', 'Kameez Shalwar'];
 
-const formatCurrency = (amount, currency = 'PKR') =>
-  new Intl.NumberFormat('en-PK', {
+const formatCurrency = (amount, currency = 'USD') =>
+  new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency,
     maximumFractionDigits: 0,
@@ -18,7 +18,7 @@ const formatCurrency = (amount, currency = 'PKR') =>
 function ProductCard({ product, onClick }) {
   const coverImage = product?.images?.[0]?.url;
   const amount = product?.price?.amount;
-  const currency = product?.price?.currency || 'PKR';
+  const currency = product?.price?.currency || 'USD';
 
   return (
     <article onClick={onClick} className="group cursor-pointer">

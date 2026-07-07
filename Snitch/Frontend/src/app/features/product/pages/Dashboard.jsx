@@ -8,8 +8,8 @@ import { useAuth } from '../../auth/hook/useAuth';
 
 const CATEGORIES = ['shirts', 'pants', 'caps', 'hoodies', 'shoes', 'Kameez Shalwar'];
 
-const formatCurrency = (amount, currency = 'PKR') =>
-  new Intl.NumberFormat('en-PK', {
+const formatCurrency = (amount, currency = 'USD') =>
+  new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency,
     maximumFractionDigits: 0,
@@ -27,7 +27,7 @@ const formatDate = (value) =>
 function ProductCard({ product }) {
   const coverImage = product?.images?.[0]?.url;
   const amount = product?.price?.amount;
-  const currency = product?.price?.currency || 'PKR';
+  const currency = product?.price?.currency || 'USD';
 
   return (
     <Link to={`/seller-product/${product._id}`} className="block">
@@ -112,7 +112,7 @@ const Dashboard = () => {
     (sum, product) => sum + (Number(product?.price?.amount) || 0),
     0,
   );
-  const primaryCurrency = products?.[0]?.price?.currency || 'PKR';
+  const primaryCurrency = products?.[0]?.price?.currency || 'USD';
 
   const filteredProducts =
     selectedCategory === 'all'

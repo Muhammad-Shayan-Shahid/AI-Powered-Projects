@@ -21,7 +21,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 app.use(cors({
-    origin: config.FRONTEND_URL || 'http://localhost:5173',
+    origin: [config.FRONTEND_URL],
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true
 }));

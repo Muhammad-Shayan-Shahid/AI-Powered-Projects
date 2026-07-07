@@ -24,7 +24,7 @@ const MAX_VARIANT_IMAGES = 4;
 
 const defaultVariantForm = {
   price: '',
-  currency: 'PKR',
+  currency: 'USD',
   stock: '',
   attributes: [{ key: '', value: '' }],
   images: [],
@@ -63,7 +63,7 @@ function VariantModal({ product, editingVariant, onClose, onSaved }) {
         images: [],
       };
     }
-    return { ...defaultVariantForm, currency: product.price?.currency || 'PKR' };
+    return { ...defaultVariantForm, currency: product.price?.currency || 'USD' };
   });
 
   const [imagePreviews, setImagePreviews] = useState([]);

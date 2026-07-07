@@ -10,7 +10,7 @@ const defaultForm = {
   title: '',
   description: '',
   amount: '',
-  currency: 'PKR',
+  currency: 'USD',
   category: '',
 };
 
