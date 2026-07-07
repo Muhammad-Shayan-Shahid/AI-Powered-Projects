@@ -13,10 +13,12 @@ import paymentRoutes from './routes/payment.routes.js';
 import { handleWebhook } from './controllers/payment.controller.js';
 import chatRoutes from './routes/chat.routes.js';
 import helmet from 'helmet';
-
+import { fileURLToPath } from 'url';
 
 const app = express();
 app.set('trust proxy', 1);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 app.use(cors({
     origin: [config.FRONTEND_URL],
@@ -58,7 +60,7 @@ passport.use(new GoogleStrategy({
 }, (accessToken, refreshToken, profile, done) => {
     return done(null, profile);
 }));
-app.use(express.static("./public/dist"))
+app.use(express.static(path.resolve(__dirname, '../public')));
 
 
 
@@ -68,6 +70,10 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/chat', chatRoutes);
 
+
+app.get('{*splat}', (req, res) => {
+    res.sendFile(path.resolve(__dirname, '../public/index.html'));
+});
 
 
 export default app;
