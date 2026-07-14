@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-white font-body text-charcoal antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+.font-heading {
+  @apply font-sans;
+}
+
+.italic-accent {
+  @apply font-display italic;
+}
