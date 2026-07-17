@@ -1,19 +1,64 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
 
-body {
-  @apply bg-white font-body text-charcoal antialiased;
+/* Design tokens sourced from the Bright Smile Claude Design project (auth screens) */
+@theme {
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', monospace;
+
+  /* Patient / general brand tone (indigo) */
+  --color-brand: oklch(28% 0.06 265);
+  --color-brand-hover: oklch(34% 0.065 265);
+  --color-brand-ink: oklch(22% 0.05 265);
+  --color-brand-end: oklch(34% 0.07 260);
+  --color-brand-ring: oklch(28% 0.06 265 / 0.12);
+
+  /* Doctor / clinician tone (teal) */
+  --color-clinician: oklch(30% 0.09 200);
+  --color-clinician-hover: oklch(25% 0.085 200);
+  --color-clinician-subtle: oklch(93% 0.04 195);
+  --color-clinician-end: oklch(40% 0.09 195);
+  --color-clinician-ring: oklch(30% 0.09 200 / 0.12);
+
+  /* Admin tone (near-black neutral) */
+  --color-admin: oklch(24% 0.01 260);
+  --color-admin-hover: oklch(18% 0.008 260);
+  --color-admin-ring: oklch(24% 0.01 260 / 0.1);
+
+  /* Neutrals + surfaces */
+  --color-page: oklch(96% 0.006 250);
+  --color-page-admin: oklch(94% 0.004 250);
+  --color-surface: oklch(99% 0.002 250);
+  --color-border: oklch(90% 0.008 250);
+  --color-border-admin: oklch(88% 0.006 250);
+
+  --color-ink: oklch(20% 0.015 260);
+  --color-ink-secondary: oklch(50% 0.012 260);
+  --color-ink-tertiary: oklch(64% 0.01 250);
+
+  /* Status */
+  --color-danger: oklch(55% 0.18 25);
+  --color-danger-bg: oklch(96% 0.03 25);
+  --color-danger-border: oklch(88% 0.06 25);
+  --color-danger-text: oklch(45% 0.16 25);
+  --color-success-text: oklch(45% 0.14 145);
+
+  --animate-fade-in-up: fadeInUp 550ms cubic-bezier(0.4, 0, 0.2, 1) both;
+  --animate-shake: shake 420ms cubic-bezier(0.4, 0, 0.2, 1);
+  --animate-pulse-ring: pulseRing 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
-h1,
-h2,
-h3,
-h4,
-.font-heading {
-  @apply font-sans;
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
 }
-
-.italic-accent {
-  @apply font-display italic;
+@keyframes shake {
+  10%, 90% { transform: translateX(-1px); }
+  20%, 80% { transform: translateX(2px); }
+  30%, 50%, 70% { transform: translateX(-4px); }
+  40%, 60% { transform: translateX(4px); }
+}
+@keyframes pulseRing {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.06); opacity: 0.85; }
 }

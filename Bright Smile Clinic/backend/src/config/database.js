@@ -1,12 +1,15 @@
-import mongoose from "mongoose";
-import config from "./config.js";
+const mongoose = require('mongoose');
+const { MONGO_URI } = require('./config');
 
-export default async function connectDB() {
+const connectDB = async () => {
   try {
-    await mongoose.connect(config.mongodbUri);
-    console.log(`MongoDB connected: ${mongoose.connection.host}`);
-  } catch (err) {
-    console.error("MongoDB connection failed:", err.message);
-    process.exit(1); // don't let the server run without a working DB
+    await mongoose.connect(MONGO_URI);
+    console.log('MongoDB connected');
+  } catch (error) {
+    // Fail fast: the API is useless without a DB connection.
+    console.error('MongoDB connection error:', error.message);
+    process.exit(1);
   }
-}
+};
+
+module.exports = connectDB;

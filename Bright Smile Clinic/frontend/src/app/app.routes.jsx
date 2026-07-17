@@ -1,21 +1,25 @@
-import { createBrowserRouter } from "react-router-dom";
-import MainLayout from "../components/MainLayout";
-import Home from "../features/clinicInfo/pages/Home";
-import Services from "../features/clinicInfo/pages/Services";
-import Doctors from "../features/clinicInfo/pages/Doctors";
-import InsuranceFaqs from "../features/clinicInfo/pages/InsuranceFaqs";
-import BookAppointment from "../features/appointment/pages/BookAppointment";
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import Login from '../features/auth/pages/Login';
+import Signup from '../features/auth/pages/Signup';
+import DoctorLogin from '../features/auth/pages/DoctorLogin';
+import DoctorSignup from '../features/auth/pages/DoctorSignup';
+import PendingApproval from '../features/auth/pages/PendingApproval';
+import AdminLogin from '../features/auth/pages/AdminLogin';
 
-export const AppRoutes = createBrowserRouter([
-  {
-    path: "/",
-    element: <MainLayout />,
-    children: [
-      { index: true, element: <Home /> },
-      { path: "services", element: <Services /> },
-      { path: "doctors", element: <Doctors /> },
-      { path: "insurance-faqs", element: <InsuranceFaqs /> },
-      { path: "book-appointment", element: <BookAppointment /> },
-    ],
-  },
+function Home() {
+  return <p>Frontend connected</p>;
+}
+
+const router = createBrowserRouter([
+  { path: '/', element: <Home /> },
+  { path: '/login', element: <Login /> },
+  { path: '/signup', element: <Signup /> },
+  { path: '/doctor/login', element: <DoctorLogin /> },
+  { path: '/doctor/signup', element: <DoctorSignup /> },
+  { path: '/pending-approval', element: <PendingApproval /> },
+  { path: '/admin/login', element: <AdminLogin /> },
 ]);
+
+export default function AppRoutes() {
+  return <RouterProvider router={router} />;
+}

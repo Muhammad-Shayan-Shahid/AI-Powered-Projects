@@ -1,10 +1,6 @@
-import { configureStore } from "@reduxjs/toolkit";
-import chatReducer from "../features/chatbot/state/chat.slice";
-import appointmentReducer from "../features/appointment/state/appointment.slice";
+import { configureStore } from '@reduxjs/toolkit';
 
+// Empty for now — feature slices get added here as they're built.
 export const store = configureStore({
-  reducer: {
-    chat: chatReducer,
-    appointment: appointmentReducer,
-  },
+  reducer: {},
 });

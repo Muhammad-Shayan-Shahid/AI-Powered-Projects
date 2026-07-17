@@ -1,26 +1,14 @@
-import express from "express";
-import cors from "cors";
-import chatRoutes from "./routes/chat.routes.js";
-import ingestRoutes from "./routes/ingest.routes.js";
-import appointmentRoutes from "./routes/appointment.routes.js";
-import { errorHandler } from "./middlewares/errorHandler.middleware.js";
+const express = require('express');
+const cors = require('cors');
 
 const app = express();
 
-app.use(
-  cors({
-    origin: "http://localhost:5173",
-    credentials: true,
-  })
-);
+app.use(cors());
 app.use(express.json());
 
-app.get("/health", (req, res) => res.json({ status: "ok" }));
+// Health check route to confirm the API is reachable.
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ success: true, message: 'API running' });
+});
 
-app.use("/api/chat", chatRoutes);
-app.use("/api/ingest", ingestRoutes);
-app.use("/api/appointments", appointmentRoutes);
-
-app.use(errorHandler); // must stay last
-
-export default app;
+module.exports = app;
