@@ -1,19 +1,24 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Card from '../../../components/Card';
 import Input from '../../../components/Input';
 import Button from '../../../components/Button';
 import FormAlert from '../../../components/FormAlert';
+import { useAuth } from '../hooks/useAuth';
 
 export default function AdminLogin() {
+  const navigate = useNavigate();
+  const { loginAdmin, isLoading, error, fieldErrors, clearAuthError } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    // TODO: wire up to POST /api/auth/admin/login once the backend endpoint exists.
-    // Admin accounts are never created through a public signup route (see CLAUDE.md).
+    clearAuthError();
+    const result = await loginAdmin({ email, password });
+    if (result.meta.requestStatus === 'fulfilled') {
+      navigate('/admin/dashboard');
+    }
   }
 
   return (
@@ -40,6 +45,7 @@ export default function AdminLogin() {
               placeholder="admin@brightsmile.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              error={fieldErrors?.email}
               required
             />
 
@@ -50,11 +56,12 @@ export default function AdminLogin() {
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              error={fieldErrors?.password}
               required
             />
 
-            <Button type="submit" tone="admin" pill={false} loading={loading} className="mt-1">
-              {loading ? 'Signing in…' : 'Sign in'}
+            <Button type="submit" tone="admin" pill={false} loading={isLoading} className="mt-1">
+              {isLoading ? 'Signing in…' : 'Sign in'}
             </Button>
           </form>
         </Card>

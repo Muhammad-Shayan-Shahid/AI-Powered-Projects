@@ -7,6 +7,7 @@ import HeroPerks from '../../../components/HeroPerks';
 import Input from '../../../components/Input';
 import Button from '../../../components/Button';
 import FormAlert from '../../../components/FormAlert';
+import { useAuth } from '../hooks/useAuth';
 
 const PERKS = ['Manage your own schedule', 'Grow your patient base', 'Get paid faster'];
 
@@ -24,21 +25,63 @@ const FIELD_CLASSES =
 
 export default function DoctorSignup() {
   const navigate = useNavigate();
+  const { registerDoctor, isLoading, error, fieldErrors, clearAuthError } = useAuth();
   const fileInputRef = useRef(null);
-  const [photoUrl, setPhotoUrl] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [submitError, setSubmitError] = useState(null);
+  // Photo preview only — no file upload backend exists yet, so photoUrl isn't submitted.
+  const [photoPreview, setPhotoPreview] = useState(null);
+  const [fields, setFields] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    specialization: SPECIALIZATIONS[0],
+    bio: '',
+    password: '',
+    confirm: '',
+  });
+  const [touched, setTouched] = useState({});
+
+  function update(field, value) {
+    setFields((f) => ({ ...f, [field]: value }));
+  }
+
+  function touch(field) {
+    setTouched((t) => ({ ...t, [field]: true }));
+  }
+
+  function validate() {
+    const errors = {};
+    if (touched.name && fields.name.trim().length < 2) errors.name = 'Please enter your full name.';
+    if (touched.password && fields.password.length < 8) errors.password = 'Password must be at least 8 characters.';
+    if (touched.confirm && fields.confirm !== fields.password) errors.confirm = "Passwords don't match.";
+    return errors;
+  }
+
+  const clientErrors = validate();
+  const errors = { ...clientErrors, ...fieldErrors };
 
   function handlePhotoChange(e) {
     const file = e.target.files?.[0];
-    if (file) setPhotoUrl(URL.createObjectURL(file));
+    if (file) setPhotoPreview(URL.createObjectURL(file));
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    // TODO: wire up to POST /api/auth/doctor/signup once the backend endpoint exists.
+    clearAuthError();
+    setTouched({ name: true, password: true, confirm: true });
+    if (Object.keys(validate()).length > 0) return;
+
+    const result = await registerDoctor({
+      name: fields.name,
+      email: fields.email,
+      phone: fields.phone,
+      password: fields.password,
+      specialization: fields.specialization,
+      bio: fields.bio,
+    });
     // New doctor accounts start as status "pending" — route to /pending-approval on success.
-    navigate('/pending-approval');
+    if (result.meta.requestStatus === 'fulfilled') {
+      navigate('/pending-approval');
+    }
   }
 
   return (
@@ -78,7 +121,7 @@ export default function DoctorSignup() {
             <p className="m-0 text-[0.9375rem] text-ink-secondary">Tell us about your practice.</p>
           </div>
 
-          <FormAlert>{submitError}</FormAlert>
+          <FormAlert>{error}</FormAlert>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <label className="flex flex-col gap-2">
@@ -88,10 +131,10 @@ export default function DoctorSignup() {
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-full bg-clinician-subtle bg-cover bg-center"
-                  style={photoUrl ? { backgroundImage: `url(${photoUrl})` } : undefined}
+                  style={photoPreview ? { backgroundImage: `url(${photoPreview})` } : undefined}
                   aria-label="Upload profile photo"
                 >
-                  {!photoUrl && (
+                  {!photoPreview && (
                     <svg viewBox="0 0 24 24" fill="none" className="mx-auto h-6 w-6 text-clinician/60">
                       <path
                         d="M4 8a2 2 0 0 1 2-2h1.5l1-1.5h7l1 1.5H18a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8Z"
@@ -115,7 +158,16 @@ export default function DoctorSignup() {
               </div>
             </label>
 
-            <Input label="Full name" tone="clinician" placeholder="Dr. Amara Okoye" required />
+            <Input
+              label="Full name"
+              tone="clinician"
+              placeholder="Dr. Amara Okoye"
+              value={fields.name}
+              onChange={(e) => update('name', e.target.value)}
+              onBlur={() => touch('name')}
+              error={errors.name}
+              required
+            />
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Input
@@ -123,14 +175,30 @@ export default function DoctorSignup() {
                 type="email"
                 tone="clinician"
                 placeholder="doctor@example.com"
+                value={fields.email}
+                onChange={(e) => update('email', e.target.value)}
+                error={errors.email}
                 required
               />
-              <Input label="Phone number" type="tel" tone="clinician" placeholder="(555) 555-0100" required />
+              <Input
+                label="Phone number"
+                type="tel"
+                tone="clinician"
+                placeholder="(555) 555-0100"
+                value={fields.phone}
+                onChange={(e) => update('phone', e.target.value)}
+                error={errors.phone}
+                required
+              />
             </div>
 
             <label className="flex flex-col gap-1.5">
               <span className="text-[0.8125rem] font-semibold text-ink-secondary">Specialization</span>
-              <select className={FIELD_CLASSES} defaultValue={SPECIALIZATIONS[0]}>
+              <select
+                className={FIELD_CLASSES}
+                value={fields.specialization}
+                onChange={(e) => update('specialization', e.target.value)}
+              >
                 {SPECIALIZATIONS.map((option) => (
                   <option key={option} value={option}>
                     {option}
@@ -144,6 +212,8 @@ export default function DoctorSignup() {
               <textarea
                 placeholder="A sentence or two about your background and approach to care."
                 rows={3}
+                value={fields.bio}
+                onChange={(e) => update('bio', e.target.value)}
                 className={`${FIELD_CLASSES} resize-y leading-normal`}
               />
             </label>
@@ -154,6 +224,10 @@ export default function DoctorSignup() {
                 type="password"
                 tone="clinician"
                 placeholder="At least 8 characters"
+                value={fields.password}
+                onChange={(e) => update('password', e.target.value)}
+                onBlur={() => touch('password')}
+                error={errors.password}
                 required
               />
               <Input
@@ -161,6 +235,10 @@ export default function DoctorSignup() {
                 type="password"
                 tone="clinician"
                 placeholder="Re-enter password"
+                value={fields.confirm}
+                onChange={(e) => update('confirm', e.target.value)}
+                onBlur={() => touch('confirm')}
+                error={errors.confirm}
                 required
               />
             </div>
@@ -172,8 +250,8 @@ export default function DoctorSignup() {
               </span>
             </div>
 
-            <Button type="submit" tone="clinician" loading={loading}>
-              {loading ? 'Submitting…' : 'Submit Application'}
+            <Button type="submit" tone="clinician" loading={isLoading}>
+              {isLoading ? 'Submitting…' : 'Submit Application'}
             </Button>
           </form>
 

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../../../components/Navbar';
 import Footer from '../../../components/Footer';
 import AuthCard from '../../../components/AuthCard';
@@ -7,16 +7,17 @@ import HeroPerks from '../../../components/HeroPerks';
 import Input from '../../../components/Input';
 import Button from '../../../components/Button';
 import FormAlert from '../../../components/FormAlert';
+import { useAuth } from '../hooks/useAuth';
 
 const PERKS = ['Book appointments online', 'Manage records anytime', 'Reminders before every visit'];
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function Signup() {
+  const navigate = useNavigate();
+  const { registerPatient, isLoading, error, fieldErrors, clearAuthError } = useAuth();
   const [fields, setFields] = useState({ name: '', email: '', phone: '', password: '', confirm: '' });
   const [touched, setTouched] = useState({});
-  const [loading, setLoading] = useState(false);
-  const [submitError, setSubmitError] = useState(null);
 
   function update(field, value) {
     setFields((f) => ({ ...f, [field]: value }));
@@ -36,13 +37,25 @@ export default function Signup() {
     return errors;
   }
 
-  const errors = validate();
+  const clientErrors = validate();
+  // Backend field errors (e.g. duplicate email) win once the request comes back.
+  const errors = { ...clientErrors, ...fieldErrors };
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
+    clearAuthError();
     setTouched({ name: true, email: true, phone: true, password: true, confirm: true });
     if (Object.keys(validate()).length > 0) return;
-    // TODO: wire up to POST /api/auth/patient/signup once the backend endpoint exists.
+
+    const result = await registerPatient({
+      name: fields.name,
+      email: fields.email,
+      phone: fields.phone,
+      password: fields.password,
+    });
+    if (result.meta.requestStatus === 'fulfilled') {
+      navigate('/patient/dashboard');
+    }
   }
 
   return (
@@ -78,7 +91,7 @@ export default function Signup() {
             <p className="m-0 text-[0.9375rem] text-ink-secondary">Just a few details to get you booked.</p>
           </div>
 
-          <FormAlert>{submitError}</FormAlert>
+          <FormAlert>{error}</FormAlert>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <Input
@@ -132,8 +145,8 @@ export default function Signup() {
               success={touched.confirm && !errors.confirm && fields.confirm.length > 0 ? 'Passwords match.' : undefined}
             />
 
-            <Button type="submit" tone="brand" loading={loading} className="mt-1">
-              {loading ? 'Creating account…' : 'Create Account'}
+            <Button type="submit" tone="brand" loading={isLoading} className="mt-1">
+              {isLoading ? 'Creating account…' : 'Create Account'}
             </Button>
           </form>
 

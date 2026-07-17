@@ -1,22 +1,27 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../../../components/Navbar';
 import Footer from '../../../components/Footer';
 import AuthCard from '../../../components/AuthCard';
 import Input from '../../../components/Input';
 import Button from '../../../components/Button';
 import FormAlert from '../../../components/FormAlert';
+import { useAuth } from '../hooks/useAuth';
 
 export default function Login() {
+  const navigate = useNavigate();
+  const { loginPatient, isLoading, error, fieldErrors, clearAuthError } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    // TODO: wire up to POST /api/auth/patient/login once the backend endpoint exists.
+    clearAuthError();
+    const result = await loginPatient({ email, password });
+    if (result.meta.requestStatus === 'fulfilled') {
+      navigate('/patient/dashboard');
+    }
   }
 
   return (
@@ -76,6 +81,7 @@ export default function Login() {
               placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              error={fieldErrors?.email}
               required
             />
 
@@ -85,6 +91,7 @@ export default function Login() {
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              error={fieldErrors?.password}
               required
               rightElement={
                 <button
@@ -103,8 +110,8 @@ export default function Login() {
               </a>
             </div>
 
-            <Button type="submit" tone="brand" loading={loading}>
-              {loading ? 'Logging in…' : 'Log In'}
+            <Button type="submit" tone="brand" loading={isLoading}>
+              {isLoading ? 'Logging in…' : 'Log In'}
             </Button>
           </form>
 

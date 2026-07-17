@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../../../components/Navbar';
 import Footer from '../../../components/Footer';
 import AuthCard from '../../../components/AuthCard';
@@ -7,21 +7,30 @@ import HeroPerks from '../../../components/HeroPerks';
 import Input from '../../../components/Input';
 import Button from '../../../components/Button';
 import FormAlert from '../../../components/FormAlert';
+import { useAuth } from '../hooks/useAuth';
 
 const PERKS = ['Manage your schedule', 'View patient records', 'Get new booking alerts'];
 
 export default function DoctorLogin() {
+  const navigate = useNavigate();
+  const { loginDoctor, isLoading, error, fieldErrors, clearAuthError } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    // TODO: wire up to POST /api/auth/doctor/login once the backend endpoint exists.
-    // On success with status "pending", the caller should route to /doctor/pending-approval
-    // instead of the dashboard — never a generic error (see CLAUDE.md auth strategy).
+    clearAuthError();
+    const result = await loginDoctor({ email, password });
+    if (result.meta.requestStatus !== 'fulfilled') return;
+
+    // A "pending" login isn't an error — route straight to the waiting screen
+    // instead of showing a generic failure message (see CLAUDE.md auth strategy).
+    if (result.payload.pending) {
+      navigate('/pending-approval');
+    } else {
+      navigate('/doctor/dashboard');
+    }
   }
 
   return (
@@ -71,6 +80,7 @@ export default function DoctorLogin() {
               placeholder="doctor@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              error={fieldErrors?.email}
               required
             />
 
@@ -81,6 +91,7 @@ export default function DoctorLogin() {
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              error={fieldErrors?.password}
               required
               rightElement={
                 <button
@@ -102,8 +113,8 @@ export default function DoctorLogin() {
               </a>
             </div>
 
-            <Button type="submit" tone="clinician" loading={loading}>
-              {loading ? 'Logging in…' : 'Log In'}
+            <Button type="submit" tone="clinician" loading={isLoading}>
+              {isLoading ? 'Logging in…' : 'Log In'}
             </Button>
           </form>
 
