@@ -36,16 +36,55 @@
   --color-ink-secondary: oklch(50% 0.012 260);
   --color-ink-tertiary: oklch(64% 0.01 250);
 
+  /* Coral CTA/accent (booking screens) */
+  --color-accent: oklch(70% 0.16 35);
+  --color-accent-hover: oklch(63% 0.17 35);
+  --color-accent-ink: oklch(14% 0.006 90);
+
+  /* Book Appointment wizard chrome */
+  --color-brand-subtle: oklch(94% 0.02 265);
+  --color-step-current-bg: oklch(93% 0.03 195);
+  --color-step-upcoming-bg: oklch(92% 0.006 250);
+  --color-disabled-bg: oklch(85% 0.01 250);
+  --color-disabled-text: oklch(72% 0.008 250);
+  --color-muted-bg: oklch(94% 0.006 250);
+  --color-muted-text: oklch(78% 0.008 250);
+  --color-neutral-hover: oklch(94% 0.007 90);
+  --color-shimmer-from: oklch(93% 0.006 250);
+  --color-shimmer-via: oklch(88% 0.008 250);
+
   /* Status */
   --color-danger: oklch(55% 0.18 25);
   --color-danger-bg: oklch(96% 0.03 25);
   --color-danger-border: oklch(88% 0.06 25);
   --color-danger-text: oklch(45% 0.16 25);
   --color-success-text: oklch(45% 0.14 145);
+  --color-success-bg: oklch(95% 0.03 145);
+  --color-warning-bg: oklch(96% 0.04 80);
+  --color-warning-text: oklch(50% 0.12 75);
+  --color-neutral-badge-bg: oklch(93% 0.006 250);
+  --color-neutral-badge-text: oklch(50% 0.008 250);
+  --color-rejected-bg: oklch(96% 0.035 25);
+
+  /* Slot-conflict notice (Book Appointment) */
+  --color-notice-bg: oklch(94% 0.02 220);
+  --color-notice-border: oklch(85% 0.04 220);
+  --color-notice-icon-bg: oklch(88% 0.035 220);
+  --color-notice-title: oklch(35% 0.06 220);
+  --color-notice-text: oklch(45% 0.04 220);
 
   --animate-fade-in-up: fadeInUp 550ms cubic-bezier(0.4, 0, 0.2, 1) both;
   --animate-shake: shake 420ms cubic-bezier(0.4, 0, 0.2, 1);
   --animate-pulse-ring: pulseRing 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+
+  /* Booking screens */
+  --animate-chip-in: chipIn 260ms cubic-bezier(0.4, 0, 0.2, 1) both;
+  --animate-shimmer: shimmer 1.4s ease-in-out infinite;
+  --animate-spin-fast: spin 700ms linear infinite;
+  --animate-badge-fade-in: badgeFadeIn 380ms cubic-bezier(0.4, 0, 0.2, 1) both;
+  --animate-pop-in: popIn 480ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  --animate-check-draw: checkDraw 420ms cubic-bezier(0.4, 0, 0.2, 1) 250ms both;
+  --animate-ring-pulse-once: ringPulse 1.4s cubic-bezier(0.4, 0, 0.2, 1) 1;
 }
 
 @keyframes fadeInUp {
@@ -61,4 +100,32 @@
 @keyframes pulseRing {
   0%, 100% { transform: scale(1); opacity: 1; }
   50% { transform: scale(1.06); opacity: 0.85; }
+}
+@keyframes chipIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes shimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: 200px 0; }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes badgeFadeIn {
+  from { opacity: 0; transform: scale(0.85); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes popIn {
+  0% { transform: scale(0.5); opacity: 0; }
+  60% { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1); }
+}
+@keyframes checkDraw {
+  from { stroke-dashoffset: 24; }
+  to { stroke-dashoffset: 0; }
+}
+@keyframes ringPulse {
+  0% { transform: scale(0.9); opacity: 0.6; }
+  100% { transform: scale(1.5); opacity: 0; }
 }

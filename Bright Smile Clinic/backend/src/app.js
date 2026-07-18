@@ -3,6 +3,10 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const { CLIENT_URL } = require('./config/config');
 const authRoutes = require('./routes/auth.routes');
+const serviceRoutes = require('./routes/service.routes');
+const doctorRoutes = require('./routes/doctor.routes');
+const availabilityRoutes = require('./routes/availability.routes');
+const appointmentRoutes = require('./routes/appointment.routes');
 
 const app = express();
 
@@ -18,6 +22,10 @@ app.get('/api/health', (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/services', serviceRoutes);
+app.use('/api/doctors', doctorRoutes);
+app.use('/api/availability', availabilityRoutes);
+app.use('/api/appointments', appointmentRoutes);
 
 // Catch-all for unmatched routes.
 app.use((req, res) => {

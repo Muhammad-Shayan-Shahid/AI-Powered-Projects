@@ -67,7 +67,7 @@ export async function addProductVariant(productId, newProductVariant) {
 
   formData.append('stock', newProductVariant.stock);
   formData.append('priceAmount', newProductVariant.price);
-  formData.append('priceCurrency', newProductVariant.currency || 'PKR');
+  formData.append('priceCurrency', newProductVariant.currency || 'USD');
   formData.append('attributes', JSON.stringify(newProductVariant.attributes));
 
   const response = await Api.post(`/variants/${productId}`, formData);
@@ -78,7 +78,7 @@ export async function updateProductVariant(productId, variantId, data) {
   const response = await Api.put(`/variants/${productId}/${variantId}`, {
     stock: data.stock,
     priceAmount: data.price,
-    priceCurrency: data.currency || 'PKR',
+    priceCurrency: data.currency || 'USD',
     attributes: JSON.stringify(data.attributes),
   });
   return response.data;

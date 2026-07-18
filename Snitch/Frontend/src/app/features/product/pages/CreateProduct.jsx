@@ -227,7 +227,7 @@ const CreateProduct = () => {
     payload.append('title', formData.title.trim());
     payload.append('description', formData.description.trim());
     payload.append('priceAmount', formData.amount);
-    payload.append('priceCurrency', formData.currency.trim() || 'PKR');
+    payload.append('priceCurrency', formData.currency.trim() || 'USD');
     payload.append('category', formData.category);
 
     previews.forEach((preview) => {

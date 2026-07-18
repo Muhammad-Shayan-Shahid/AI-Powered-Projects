@@ -6,8 +6,8 @@ import { useProduct } from '../hook/useProduct';
 import { useCart } from '../../cart/hook/useCart';
 import { useAuth } from '../../auth/hook/useAuth';
 
-const formatCurrency = (amount, currency = 'PKR') =>
-  new Intl.NumberFormat('en-PK', {
+const formatCurrency = (amount, currency = 'USD') =>
+  new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency,
     maximumFractionDigits: 0,
@@ -244,7 +244,7 @@ const ProductDetail = () => {
 
   const mainImage = selectedImage || displayImages[0]?.url || '';
   const amount = displayPrice?.amount;
-  const currency = displayPrice?.currency || 'PKR';
+  const currency = displayPrice?.currency || 'USD';
 
   return (
     <div className="min-h-screen bg-bg-primary text-text-primary">
@@ -350,7 +350,7 @@ const ProductDetail = () => {
                     alt={product?.title || 'Product image'}
                     className="h-full w-full object-cover transition-all duration-300"
                     decoding="async"
-                    fetchpriority="high"
+                    fetchPriority="high"
                   />
                 ) : (
                   <div className="flex h-full items-center justify-center text-sm text-text-muted">
@@ -589,7 +589,7 @@ const ProductDetail = () => {
               {recommendedProducts.map((recProduct) => {
                 const recImage = recProduct.images?.[0]?.url;
                 const recAmount = recProduct.price?.amount;
-                const recCurrency = recProduct.price?.currency || 'PKR';
+                const recCurrency = recProduct.price?.currency || 'USD';
                 return (
                   <article
                     key={recProduct._id}

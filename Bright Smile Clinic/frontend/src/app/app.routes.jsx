@@ -8,6 +8,9 @@ import AdminLogin from '../features/auth/pages/AdminLogin';
 import PatientDashboard from '../features/patient/pages/PatientDashboard';
 import DoctorDashboard from '../features/doctor/pages/DoctorDashboard';
 import AdminDashboard from '../features/admin/pages/AdminDashboard';
+import BookAppointment from '../features/booking/pages/BookAppointment';
+import MyAppointments from '../features/booking/pages/MyAppointments';
+import BookingConfirmation from '../features/booking/pages/BookingConfirmation';
 import ProtectedRoute from './ProtectedRoute';
 
 function Home() {
@@ -43,6 +46,30 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute roles={['admin']}>
         <AdminDashboard />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/booking/book',
+    element: (
+      <ProtectedRoute roles={['patient']}>
+        <BookAppointment />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/booking/my-appointments',
+    element: (
+      <ProtectedRoute roles={['patient']}>
+        <MyAppointments />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/booking/confirmation',
+    element: (
+      <ProtectedRoute roles={['patient']}>
+        <BookingConfirmation />
       </ProtectedRoute>
     ),
   },

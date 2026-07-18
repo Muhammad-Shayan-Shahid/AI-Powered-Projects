@@ -57,7 +57,7 @@ function VariantModal({ product, editingVariant, onClose, onSaved }) {
         : [{ key: '', value: '' }];
       return {
         price: editingVariant.price?.amount ?? '',
-        currency: editingVariant.price?.currency || product.price?.currency || 'PKR',
+        currency: editingVariant.price?.currency || product.price?.currency || 'USD',
         stock: editingVariant.stock ?? '',
         attributes: attrs.length ? attrs : [{ key: '', value: '' }],
         images: [],
@@ -156,7 +156,7 @@ function VariantModal({ product, editingVariant, onClose, onSaved }) {
     const payload = {
       stock: Number(form.stock),
       price: form.price !== '' ? form.price : product.price?.amount,
-      currency: form.currency || product.price?.currency || 'PKR',
+      currency: form.currency || product.price?.currency || 'USD',
       attributes: attributesObj,
       images: form.images,
     };
@@ -380,11 +380,11 @@ function VariantCard({ variant, productCurrency, onEdit, onDelete }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const attrs = variant.attributes ? Object.entries(variant.attributes) : [];
   const priceAmount = variant.price?.amount;
-  const priceCurrency = variant.price?.currency || productCurrency || 'PKR';
+  const priceCurrency = variant.price?.currency || productCurrency || 'USD';
 
   const formatted =
     priceAmount != null
-      ? new Intl.NumberFormat('en-PK', {
+      ? new Intl.NumberFormat('en-US', {
           style: 'currency',
           currency: priceCurrency,
           maximumFractionDigits: 0,
@@ -590,9 +590,9 @@ const SellerproductDetails = () => {
                 <div>
                   <p className="text-sm text-text-muted">Base Price</p>
                   <p className="mt-1 text-base font-medium text-text-primary">
-                    {new Intl.NumberFormat('en-PK', {
+                    {new Intl.NumberFormat('en-US', {
                       style: 'currency',
-                      currency: product.price?.currency || 'PKR',
+                      currency: product.price?.currency || 'USD',
                       maximumFractionDigits: 0,
                     }).format(product.price?.amount || 0)}
                   </p>

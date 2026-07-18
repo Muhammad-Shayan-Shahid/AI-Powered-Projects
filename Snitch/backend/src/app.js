@@ -20,8 +20,13 @@ app.set('trust proxy', 1);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const allowedOrigins = [config.FRONTEND_URL];
+if (process.env.NODE_ENV !== 'production') {
+    allowedOrigins.push('http://localhost:5173');
+}
+
 app.use(cors({
-    origin: [config.FRONTEND_URL],
+    origin: allowedOrigins,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true
 }));
