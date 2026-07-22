@@ -17,7 +17,12 @@ import {
   clearDoctorActionError,
   clearServiceActionError,
   clearDocumentActionError,
+  documentUploadStarted,
+  documentUploadProgressed,
+  documentUploadSucceeded,
+  documentUploadFailed,
 } from '../state/admin.slice';
+import { adminService } from '../services/adminService';
 
 // Wraps the admin slice so pages never touch dispatch/thunks directly.
 export function useAdmin() {
@@ -45,6 +50,7 @@ export function useAdmin() {
     documentsError: admin.documentsError,
     savingDocumentIds: admin.savingDocumentIds,
     documentActionError: admin.documentActionError,
+    documentUploadProgress: admin.documentUploadProgress,
 
     allAppointments: admin.allAppointments,
     isLoadingAllAppointments: admin.isLoadingAllAppointments,
@@ -65,6 +71,26 @@ export function useAdmin() {
     createDocument: useCallback((payload) => dispatch(createDocument(payload)), [dispatch]),
     updateDocument: useCallback((id, payload) => dispatch(updateDocument({ id, payload })), [dispatch]),
     deleteDocument: useCallback((id) => dispatch(deleteDocument(id)), [dispatch]),
+
+    // Bypasses the thunk pattern for the same reason as useDoctor's
+    // uploadProfile: a live onProgress callback can't travel through a
+    // createAsyncThunk arg. `id` present -> update (PUT), absent -> create (POST).
+    uploadDocument: useCallback(
+      async (formData, id) => {
+        dispatch(documentUploadStarted());
+        try {
+          const data = id
+            ? await adminService.uploadDocumentUpdate(id, formData, (percent) => dispatch(documentUploadProgressed(percent)))
+            : await adminService.uploadDocument(formData, (percent) => dispatch(documentUploadProgressed(percent)));
+          dispatch(documentUploadSucceeded(data));
+          return data;
+        } catch (error) {
+          dispatch(documentUploadFailed(error.message));
+          throw error;
+        }
+      },
+      [dispatch]
+    ),
 
     fetchAllAppointments: useCallback((filters) => dispatch(fetchAllAppointments(filters)), [dispatch]),
 

@@ -139,6 +139,12 @@ const initialState = {
   documentsError: null,
   savingDocumentIds: [],
   documentActionError: null,
+  // Real upload percentage (0-100) for the Knowledge Base "Upload file" mode,
+  // driven by uploadRequest's XHR progress event. Set via plain actions
+  // (dispatched directly from useAdmin's uploadDocument, see there) rather
+  // than a createAsyncThunk lifecycle, since a live onProgress callback can't
+  // safely travel through a thunk arg (Redux Toolkit's serializableCheck flags it).
+  documentUploadProgress: 0,
 
   allAppointments: [],
   isLoadingAllAppointments: false,
@@ -157,6 +163,24 @@ const adminSlice = createSlice({
     },
     clearDocumentActionError(state) {
       state.documentActionError = null;
+    },
+    documentUploadStarted(state) {
+      state.isLoadingDocuments = false;
+      state.documentActionError = null;
+      state.documentUploadProgress = 0;
+    },
+    documentUploadProgressed(state, action) {
+      state.documentUploadProgress = action.payload;
+    },
+    documentUploadSucceeded(state, action) {
+      state.documentUploadProgress = 100;
+      const idx = state.documents.findIndex((d) => d._id === action.payload.document._id);
+      if (idx !== -1) state.documents[idx] = action.payload.document;
+      else state.documents.push(action.payload.document);
+    },
+    documentUploadFailed(state, action) {
+      state.documentActionError = action.payload || 'Could not save this document.';
+      state.documentUploadProgress = 0;
     },
   },
   extraReducers: (builder) => {
@@ -309,5 +333,13 @@ const adminSlice = createSlice({
   },
 });
 
-export const { clearDoctorActionError, clearServiceActionError, clearDocumentActionError } = adminSlice.actions;
+export const {
+  clearDoctorActionError,
+  clearServiceActionError,
+  clearDocumentActionError,
+  documentUploadStarted,
+  documentUploadProgressed,
+  documentUploadSucceeded,
+  documentUploadFailed,
+} = adminSlice.actions;
 export default adminSlice.reducer;

@@ -1,3 +1,5 @@
+import { uploadRequest } from '../../../utils/uploadRequest';
+
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
 // Mirrors authService/doctorService's request wrapper: always sends the httpOnly
@@ -50,4 +52,13 @@ export const adminService = {
   deleteDocument: (id) => request(`/admin/documents/${id}`, { method: 'DELETE' }),
 
   listAllAppointments: (filters) => request(`/admin/appointments${buildQuery(filters)}`),
+
+  // multipart/form-data (title, category, and either a pasted `content`
+  // string or a `file` PDF) — built on XHR (uploadRequest) rather than the
+  // fetch-based request() above so onProgress can drive a real progress bar.
+  // Used only for the Knowledge Base "Upload file" mode; "Paste text" still
+  // goes through createDocument/updateDocument above as plain JSON.
+  uploadDocument: (formData, onProgress) => uploadRequest('/admin/documents', formData, { method: 'POST', onProgress }),
+  uploadDocumentUpdate: (id, formData, onProgress) =>
+    uploadRequest(`/admin/documents/${id}`, formData, { method: 'PUT', onProgress }),
 };

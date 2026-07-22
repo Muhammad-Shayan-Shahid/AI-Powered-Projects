@@ -28,18 +28,22 @@ export default function KnowledgeBase() {
     documentsError,
     savingDocumentIds,
     documentActionError,
+    documentUploadProgress,
     fetchDocuments,
     createDocument,
     updateDocument,
     deleteDocument,
+    uploadDocument,
   } = useAdmin();
 
   const [formOpen, setFormOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
-  const [mode, setMode] = useState('paste'); // 'paste' | 'upload' — only paste is wired to a backend, see note below
+  const [mode, setMode] = useState('paste'); // 'paste' | 'upload'
+  const [pdfFile, setPdfFile] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const [formError, setFormError] = useState(null);
+  const [extractionNotice, setExtractionNotice] = useState(null);
 
   useEffect(() => {
     fetchDocuments();
@@ -50,6 +54,7 @@ export default function KnowledgeBase() {
     setEditingId(null);
     setForm(EMPTY_FORM);
     setMode('paste');
+    setPdfFile(null);
     setFormError(null);
     setFormOpen(true);
   }
@@ -57,6 +62,7 @@ export default function KnowledgeBase() {
     setEditingId(doc._id);
     setForm({ title: doc.title, category: doc.category, content: doc.content });
     setMode('paste');
+    setPdfFile(null);
     setFormError(null);
     setFormOpen(true);
   }
@@ -66,20 +72,31 @@ export default function KnowledgeBase() {
   function setField(field, value) {
     setForm((prev) => ({ ...prev, [field]: value }));
   }
+  function handleFileChange(e) {
+    setPdfFile(e.target.files?.[0] || null);
+  }
 
   async function handleSave(e) {
     e.preventDefault();
-    if (!form.title.trim() || !form.content.trim()) return;
-
-    const payload = { title: form.title, category: form.category, content: form.content };
+    if (!form.title.trim()) return;
+    if (mode === 'paste' && !form.content.trim()) return;
+    if (mode === 'upload' && !pdfFile) return;
 
     setIsSaving(true);
     setFormError(null);
+    setExtractionNotice(null);
     try {
-      if (editingId) {
-        await updateDocument(editingId, payload).unwrap();
+      if (mode === 'upload') {
+        const formData = new FormData();
+        formData.append('title', form.title);
+        formData.append('category', form.category);
+        formData.append('file', pdfFile);
+        const data = await uploadDocument(formData, editingId);
+        if (data.extractionWarning) setExtractionNotice(data.extractionWarning);
+      } else if (editingId) {
+        await updateDocument(editingId, { title: form.title, category: form.category, content: form.content }).unwrap();
       } else {
-        await createDocument(payload).unwrap();
+        await createDocument({ title: form.title, category: form.category, content: form.content }).unwrap();
       }
       setFormOpen(false);
     } catch (error) {
@@ -114,6 +131,14 @@ export default function KnowledgeBase() {
 
         {documentsError && <FormAlert>{documentsError}</FormAlert>}
         {documentActionError && <FormAlert>{documentActionError}</FormAlert>}
+        {extractionNotice && (
+          <div className="mb-4 flex max-w-[560px] items-start gap-2.5 rounded-xl border border-warning-bg bg-warning-bg px-3.5 py-3">
+            <span className="flex h-[18px] w-[18px] flex-shrink-0 items-center justify-center rounded-full bg-warning-text text-xs font-bold text-white">
+              !
+            </span>
+            <span className="text-sm font-medium text-warning-text">{extractionNotice}</span>
+          </div>
+        )}
 
         {formOpen && (
           <form
@@ -182,18 +207,38 @@ export default function KnowledgeBase() {
               />
             )}
             {mode === 'upload' && (
-              <div className="rounded-xl border-[1.5px] border-dashed border-[oklch(85%_0.01_250)] px-6 py-6 text-center text-[0.8125rem] font-medium text-ink-tertiary">
-                File upload isn't wired up to storage yet — switch to "Paste text" to save this document for now.
+              <div className="flex flex-col gap-2.5">
+                <label
+                  htmlFor="kb-pdf-file"
+                  className="cursor-pointer rounded-xl border-[1.5px] border-dashed border-[oklch(85%_0.01_250)] px-6 py-6 text-center text-[0.8125rem] font-medium text-ink-tertiary transition-colors duration-150 ease-in-out hover:border-brand"
+                >
+                  {pdfFile ? pdfFile.name : 'Click to choose a PDF file, or drop one here.'}
+                </label>
+                <input
+                  id="kb-pdf-file"
+                  type="file"
+                  accept="application/pdf"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+                {isSaving && (
+                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-page-admin">
+                    <div
+                      className="h-full rounded-full bg-brand transition-[width] duration-150 ease-out"
+                      style={{ width: `${documentUploadProgress}%` }}
+                    />
+                  </div>
+                )}
               </div>
             )}
 
             <div className="flex gap-2.5">
               <button
                 type="submit"
-                disabled={isSaving || mode === 'upload'}
+                disabled={isSaving || (mode === 'upload' && !pdfFile)}
                 className="rounded-full bg-brand px-[22px] py-2.5 text-[0.8125rem] font-bold text-white transition-colors duration-150 ease-in-out hover:bg-brand-hover disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {isSaving ? 'Saving…' : 'Save document'}
+                {isSaving ? (mode === 'upload' ? `Uploading… ${documentUploadProgress}%` : 'Saving…') : 'Save document'}
               </button>
               <button
                 type="button"

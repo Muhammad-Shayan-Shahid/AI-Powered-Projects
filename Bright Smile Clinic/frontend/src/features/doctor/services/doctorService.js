@@ -1,3 +1,5 @@
+import { uploadRequest } from '../../../utils/uploadRequest';
+
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
 // Mirrors authService/bookingService's request wrapper: always sends the httpOnly
@@ -34,5 +36,10 @@ export const doctorService = {
   updateAvailability: (id, payload) => request(`/availability/${id}`, { method: 'PATCH', body: payload }),
   deleteAvailability: (id) => request(`/availability/${id}`, { method: 'DELETE' }),
 
-  updateProfile: (payload) => request('/users/doctor-profile', { method: 'PATCH', body: payload }),
+  // multipart/form-data (specialization, bio, optional `photo` file) so a
+  // real image upload can flow through to ImageKit — see upload.service.js.
+  // Built on XHR (uploadRequest), not the fetch-based request() above, so an
+  // onProgress callback can drive a real progress bar.
+  uploadProfile: (formData, onProgress) =>
+    uploadRequest('/users/doctor-profile', formData, { method: 'PATCH', onProgress }),
 };

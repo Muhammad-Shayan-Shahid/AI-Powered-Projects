@@ -76,14 +76,6 @@ export const deleteAvailability = createAsyncThunk('doctor/deleteAvailability', 
   }
 });
 
-export const updateDoctorProfile = createAsyncThunk('doctor/updateProfile', async (payload, thunkAPI) => {
-  try {
-    return await doctorService.updateProfile(payload);
-  } catch (error) {
-    return rejectWithDoctorError(error, thunkAPI);
-  }
-});
-
 const initialState = {
   stats: null,
   isLoadingStats: false,
@@ -103,6 +95,12 @@ const initialState = {
 
   isSavingProfile: false,
   profileError: null,
+  // Real upload percentage (0-100), driven by uploadRequest's XHR progress
+  // event — see doctorService.uploadProfile and ProfileEdit.jsx. Not a thunk
+  // lifecycle field: profile upload is dispatched as plain actions instead of
+  // a createAsyncThunk so the onProgress callback (a function) never has to
+  // travel through a thunk arg, which Redux Toolkit's serializableCheck flags.
+  profileUploadProgress: 0,
 };
 
 const doctorSlice = createSlice({
@@ -117,6 +115,23 @@ const doctorSlice = createSlice({
     },
     clearProfileError(state) {
       state.profileError = null;
+    },
+    profileUploadStarted(state) {
+      state.isSavingProfile = true;
+      state.profileError = null;
+      state.profileUploadProgress = 0;
+    },
+    profileUploadProgressed(state, action) {
+      state.profileUploadProgress = action.payload;
+    },
+    profileUploadSucceeded(state) {
+      state.isSavingProfile = false;
+      state.profileUploadProgress = 100;
+    },
+    profileUploadFailed(state, action) {
+      state.isSavingProfile = false;
+      state.profileError = action.payload || 'Could not update profile.';
+      state.profileUploadProgress = 0;
     },
   },
   extraReducers: (builder) => {
@@ -217,21 +232,17 @@ const doctorSlice = createSlice({
       })
       .addCase(deleteAvailability.rejected, (state, action) => {
         state.availabilityError = action.payload?.message || 'Could not save availability.';
-      })
-
-      .addCase(updateDoctorProfile.pending, (state) => {
-        state.isSavingProfile = true;
-        state.profileError = null;
-      })
-      .addCase(updateDoctorProfile.fulfilled, (state) => {
-        state.isSavingProfile = false;
-      })
-      .addCase(updateDoctorProfile.rejected, (state, action) => {
-        state.isSavingProfile = false;
-        state.profileError = action.payload?.message || 'Could not update profile.';
       });
   },
 });
 
-export const { clearActionError, clearAvailabilityError, clearProfileError } = doctorSlice.actions;
+export const {
+  clearActionError,
+  clearAvailabilityError,
+  clearProfileError,
+  profileUploadStarted,
+  profileUploadProgressed,
+  profileUploadSucceeded,
+  profileUploadFailed,
+} = doctorSlice.actions;
 export default doctorSlice.reducer;

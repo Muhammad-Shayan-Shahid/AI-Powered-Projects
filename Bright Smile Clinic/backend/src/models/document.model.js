@@ -14,9 +14,12 @@ const documentSchema = new mongoose.Schema(
       enum: ['insurance', 'policy', 'procedure_instructions'],
       required: true,
     },
+    // Not `required` — a PDF upload can legitimately land with empty content
+    // when text extraction fails (e.g. a scanned/image-only PDF); the file
+    // itself is still saved via fileUrl. See document.controller.js.
     content: {
       type: String,
-      required: true,
+      default: '',
     },
     fileUrl: {
       type: String,

@@ -66,23 +66,37 @@ export default function DoctorSidebar() {
             </Link>
           );
         })}
+
+        {/* Desktop has its own logout button in the profile block below (hidden on
+            mobile); this copy lives in the dropdown so mobile has one too. */}
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="hidden rounded-[10px] border-t border-white/[0.14] px-3 py-2.5 pt-4 text-left text-sm font-semibold text-white/75 transition-colors duration-150 ease-in-out hover:text-white max-md:block"
+        >
+          Log out
+        </button>
       </nav>
 
-      <button
-        onClick={handleLogout}
-        className="mt-auto flex items-center gap-2.5 border-none border-t border-white/[0.14] bg-transparent p-2 pt-3 text-left max-md:hidden"
-        title="Log out"
-      >
+      <div className="mt-auto flex items-center gap-2.5 border-t border-white/[0.14] p-2 pt-3 max-md:hidden">
         <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-clinician-subtle text-[0.8125rem] font-bold text-clinician">
           {getInitials(user?.name)}
         </div>
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <div className="overflow-hidden text-ellipsis whitespace-nowrap text-[0.8125rem] font-bold">
             Dr. {user?.name}
           </div>
           <div className="text-xs text-white/60">{user?.specialization || 'Specialization not set'}</div>
         </div>
-      </button>
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="flex-shrink-0 rounded-lg border-none bg-white/[0.1] px-3 py-1.5 text-xs font-semibold text-white/80 transition-colors duration-150 ease-in-out hover:bg-white/[0.18] hover:text-white"
+          title="Log out"
+        >
+          Log out
+        </button>
+      </div>
     </aside>
   );
 }
