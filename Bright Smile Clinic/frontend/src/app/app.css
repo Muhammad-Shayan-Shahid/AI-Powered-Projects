@@ -24,6 +24,7 @@
   --color-admin: oklch(24% 0.01 260);
   --color-admin-hover: oklch(18% 0.008 260);
   --color-admin-ring: oklch(24% 0.01 260 / 0.1);
+  --color-admin-ink: oklch(20% 0.008 260);
 
   /* Neutrals + surfaces */
   --color-page: oklch(96% 0.006 250);
@@ -128,4 +129,16 @@
 @keyframes ringPulse {
   0% { transform: scale(0.9); opacity: 0.6; }
   100% { transform: scale(1.5); opacity: 0; }
+}
+
+/* Interaction-polish pass: hover/focus transitions and lift effects should be
+   near-instant (not fully removed, so focus/press feedback still registers)
+   for users who've asked the OS to reduce motion. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

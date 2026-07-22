@@ -8,7 +8,7 @@ export default function Navbar() {
       </Link>
       <a
         href="#"
-        className="text-sm font-medium text-ink-secondary no-underline transition-colors hover:text-brand"
+        className="text-sm font-medium text-ink-secondary no-underline transition-colors duration-200 ease-in-out hover:text-brand"
       >
         Need help? Contact support
       </a>

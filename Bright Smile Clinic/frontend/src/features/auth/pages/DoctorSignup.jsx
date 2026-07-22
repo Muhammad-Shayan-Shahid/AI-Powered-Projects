@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../../../components/Navbar';
 import Footer from '../../../components/Footer';
@@ -21,7 +21,7 @@ const SPECIALIZATIONS = [
 ];
 
 const FIELD_CLASSES =
-  'w-full rounded-xl border-[1.5px] border-border bg-surface px-4 py-3 font-sans text-[0.9375rem] text-ink outline-none transition-all duration-150 ease-out placeholder:text-ink-tertiary focus:border-clinician focus:ring-[3px] focus:ring-clinician-ring';
+  'w-full rounded-xl border-[1.5px] border-border bg-surface px-4 py-3 font-sans text-[0.9375rem] text-ink outline-none transition-all duration-200 ease-in-out placeholder:text-ink-tertiary hover:border-clinician/40 focus:border-clinician focus:ring-[3px] focus:ring-clinician-ring';
 
 export default function DoctorSignup() {
   const navigate = useNavigate();
@@ -39,6 +39,12 @@ export default function DoctorSignup() {
     confirm: '',
   });
   const [touched, setTouched] = useState({});
+
+  // Wipe any leftover error from a previous auth form (e.g. a failed login)
+  // so it doesn't bleed into this page on navigation.
+  useEffect(() => {
+    clearAuthError();
+  }, [clearAuthError]);
 
   function update(field, value) {
     setFields((f) => ({ ...f, [field]: value }));
@@ -130,7 +136,7 @@ export default function DoctorSignup() {
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-full bg-clinician-subtle bg-cover bg-center"
+                  className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-full bg-clinician-subtle bg-cover bg-center transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-md active:scale-100"
                   style={photoPreview ? { backgroundImage: `url(${photoPreview})` } : undefined}
                   aria-label="Upload profile photo"
                 >
@@ -259,7 +265,7 @@ export default function DoctorSignup() {
             Already have an account?{' '}
             <Link
               to="/doctor/login"
-              className="font-semibold text-clinician no-underline hover:text-clinician-hover"
+              className="font-semibold text-clinician no-underline transition-colors duration-200 ease-in-out hover:text-clinician-hover"
             >
               Log in
             </Link>

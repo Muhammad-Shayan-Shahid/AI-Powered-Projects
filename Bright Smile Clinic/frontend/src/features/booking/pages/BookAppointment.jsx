@@ -221,7 +221,7 @@ export default function BookAppointment() {
                 <div
                   key={doc._id}
                   onClick={() => selectDoctor(doc._id)}
-                  className={`flex cursor-pointer items-center gap-3 rounded-2xl border-[1.5px] p-3.5 transition-colors duration-150 ${
+                  className={`flex cursor-pointer items-center gap-3 rounded-2xl border-[1.5px] p-3.5 transition-all duration-200 ease-in-out hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 active:scale-[0.99] ${
                     doctorId === doc._id ? 'border-brand bg-brand-subtle' : 'border-border bg-surface'
                   }`}
                 >
@@ -246,7 +246,7 @@ export default function BookAppointment() {
                   key={svc._id}
                   type="button"
                   onClick={() => selectService(svc._id)}
-                  className={`rounded-full border-[1.5px] px-[18px] py-2.5 text-sm font-semibold transition-colors duration-150 ${
+                  className={`rounded-full border-[1.5px] px-[18px] py-2.5 text-sm font-semibold transition-all duration-200 ease-in-out hover:-translate-y-0.5 hover:shadow-sm active:scale-[0.98] ${
                     serviceId === svc._id ? 'border-brand bg-brand text-white' : 'border-border bg-surface text-ink'
                   }`}
                 >
@@ -261,7 +261,7 @@ export default function BookAppointment() {
             <button
               type="button"
               onClick={openCalendar}
-              className="flex w-full items-center justify-between rounded-xl border-[1.5px] border-border bg-surface px-4 py-3 text-[0.9375rem] font-semibold text-ink transition-colors duration-150 hover:border-brand"
+              className="flex w-full items-center justify-between rounded-xl border-[1.5px] border-border bg-surface px-4 py-3 text-[0.9375rem] font-semibold text-ink transition-all duration-200 ease-in-out hover:border-brand hover:shadow-sm active:scale-[0.99]"
             >
               <span>{dateKey ? formatDateLabel(dateKey) : 'Choose a date'}</span>
               <span className="text-base text-ink-secondary" aria-hidden="true">📅</span>
@@ -281,7 +281,7 @@ export default function BookAppointment() {
                   <button
                     type="button"
                     onClick={() => changeMonth(-1)}
-                    className="h-8 w-8 rounded-[10px] border-[1.5px] border-border bg-surface text-base font-bold text-ink hover:bg-neutral-hover"
+                    className="h-8 w-8 rounded-[10px] border-[1.5px] border-border bg-surface text-base font-bold text-ink transition-all duration-200 ease-in-out hover:bg-neutral-hover hover:shadow-sm active:scale-[0.95]"
                   >
                     ‹
                   </button>
@@ -289,7 +289,7 @@ export default function BookAppointment() {
                   <button
                     type="button"
                     onClick={() => changeMonth(1)}
-                    className="h-8 w-8 rounded-[10px] border-[1.5px] border-border bg-surface text-base font-bold text-ink hover:bg-neutral-hover"
+                    className="h-8 w-8 rounded-[10px] border-[1.5px] border-border bg-surface text-base font-bold text-ink transition-all duration-200 ease-in-out hover:bg-neutral-hover hover:shadow-sm active:scale-[0.95]"
                   >
                     ›
                   </button>
@@ -306,7 +306,7 @@ export default function BookAppointment() {
                       type="button"
                       disabled={cell.disabled}
                       onClick={cell.select}
-                      className={`aspect-square min-h-[38px] rounded-[10px] border-[1.5px] text-[0.8125rem] font-semibold transition-all duration-150 ${cell.visible ? 'visible' : 'invisible'} ${cell.className}`}
+                      className={`aspect-square min-h-[38px] rounded-[10px] border-[1.5px] text-[0.8125rem] font-semibold transition-all duration-200 ease-in-out enabled:hover:-translate-y-0.5 enabled:hover:shadow-sm active:scale-[0.95] ${cell.visible ? 'visible' : 'invisible'} ${cell.className}`}
                     >
                       {cell.day}
                     </button>
@@ -352,7 +352,7 @@ export default function BookAppointment() {
                       type="button"
                       onClick={() => selectSlot(time)}
                       style={{ animationDelay: `${i * 30}ms` }}
-                      className={`animate-chip-in rounded-full border-[1.5px] px-2 py-[11px] text-[0.8125rem] font-semibold transition-all duration-150 ${
+                      className={`animate-chip-in rounded-full border-[1.5px] px-2 py-[11px] text-[0.8125rem] font-semibold transition-all duration-200 ease-in-out hover:-translate-y-0.5 hover:shadow-sm active:scale-[0.98] ${
                         slot === time ? 'border-accent bg-accent text-accent-ink' : 'border-border bg-surface text-ink'
                       }`}
                     >
@@ -379,8 +379,8 @@ export default function BookAppointment() {
             type="button"
             onClick={handleConfirm}
             disabled={!allDone || isBooking}
-            className={`flex items-center gap-2.5 rounded-full px-8 py-3.5 text-[0.9375rem] font-bold text-white transition-colors duration-150 active:scale-[0.98] ${
-              allDone ? 'cursor-pointer bg-accent hover:bg-accent-hover' : 'cursor-not-allowed bg-disabled-bg'
+            className={`flex items-center gap-2.5 rounded-full px-8 py-3.5 text-[0.9375rem] font-bold text-white transition-all duration-200 ease-in-out active:scale-[0.98] ${
+              allDone ? 'cursor-pointer bg-accent hover:-translate-y-0.5 hover:bg-accent-hover hover:shadow-md' : 'cursor-not-allowed bg-disabled-bg'
             }`}
           >
             {isBooking ? (

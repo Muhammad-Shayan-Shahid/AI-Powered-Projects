@@ -1,9 +1,9 @@
 import { useId } from 'react';
 
 const TONE_CLASSES = {
-  brand: 'focus:border-brand focus:ring-brand-ring',
-  clinician: 'focus:border-clinician focus:ring-clinician-ring',
-  admin: 'focus:border-admin focus:ring-admin-ring',
+  brand: 'hover:border-brand/40 focus:border-brand focus:ring-brand-ring',
+  clinician: 'hover:border-clinician/40 focus:border-clinician focus:ring-clinician-ring',
+  admin: 'hover:border-admin/40 focus:border-admin focus:ring-admin-ring',
 };
 
 export default function Input({
@@ -29,7 +29,7 @@ export default function Input({
           id={inputId}
           className={[
             'w-full rounded-xl border-[1.5px] bg-surface px-4 py-3 font-sans text-[0.9375rem] text-ink',
-            'outline-none transition-all duration-150 ease-out placeholder:text-ink-tertiary',
+            'outline-none transition-all duration-200 ease-in-out placeholder:text-ink-tertiary',
             'focus:ring-[3px]',
             error ? 'border-danger' : 'border-border',
             TONE_CLASSES[tone] || TONE_CLASSES.brand,

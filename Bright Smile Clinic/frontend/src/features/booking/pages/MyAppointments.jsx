@@ -39,7 +39,7 @@ export default function MyAppointments() {
           </div>
           <Link
             to="/booking/book"
-            className="inline-flex items-center rounded-full bg-accent px-[22px] py-3 text-sm font-bold text-accent-ink no-underline transition-colors duration-150 hover:bg-accent-hover"
+            className="inline-flex items-center rounded-full bg-accent px-[22px] py-3 text-sm font-bold text-accent-ink no-underline transition-all duration-200 ease-in-out hover:-translate-y-0.5 hover:bg-accent-hover hover:shadow-md active:scale-[0.98]"
           >
             Book new
           </Link>
@@ -60,7 +60,7 @@ export default function MyAppointments() {
               return (
                 <div
                   key={appt._id}
-                  className="flex animate-fade-in-up flex-wrap items-center gap-4 rounded-2xl border border-border bg-surface p-5"
+                  className="flex animate-fade-in-up flex-wrap items-center gap-4 rounded-2xl border border-border bg-surface p-5 transition-all duration-200 ease-in-out hover:-translate-y-0.5 hover:shadow-md"
                 >
                   <DoctorAvatar initials={getInitials(doctorName)} size={48} />
                   <div className="min-w-[180px] flex-1">
@@ -75,7 +75,7 @@ export default function MyAppointments() {
                       type="button"
                       onClick={() => cancelAppointment(appt._id)}
                       disabled={cancelingId === appt._id}
-                      className="rounded-full border-[1.5px] border-[oklch(85%_0.01_250)] bg-transparent px-4.5 py-2.5 text-[0.8125rem] font-semibold text-ink-secondary transition-all duration-150 hover:border-danger-border hover:bg-danger-bg hover:text-danger-text disabled:cursor-not-allowed disabled:opacity-60"
+                      className="rounded-full border-[1.5px] border-[oklch(85%_0.01_250)] bg-transparent px-4.5 py-2.5 text-[0.8125rem] font-semibold text-ink-secondary transition-all duration-200 ease-in-out enabled:hover:-translate-y-0.5 enabled:hover:border-danger-border enabled:hover:bg-danger-bg enabled:hover:text-danger-text enabled:hover:shadow-sm active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       {cancelingId === appt._id ? 'Cancelling…' : 'Cancel'}
                     </button>
@@ -99,7 +99,7 @@ export default function MyAppointments() {
             </div>
             <Link
               to="/booking/book"
-              className="inline-flex items-center rounded-full bg-brand px-[26px] py-3.5 text-sm font-bold text-white no-underline transition-colors duration-150 hover:bg-brand-hover"
+              className="inline-flex items-center rounded-full bg-brand px-[26px] py-3.5 text-sm font-bold text-white no-underline transition-all duration-200 ease-in-out hover:-translate-y-0.5 hover:bg-brand-hover hover:shadow-md active:scale-[0.98]"
             >
               Book your first visit
             </Link>

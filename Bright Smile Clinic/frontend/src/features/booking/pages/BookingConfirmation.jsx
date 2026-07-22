@@ -64,7 +64,7 @@ export default function BookingConfirmation() {
 
           <Link
             to="/booking/my-appointments"
-            className="flex w-full items-center justify-center rounded-full bg-brand px-4 py-3.5 text-[0.9375rem] font-bold text-white no-underline transition-colors duration-150 hover:bg-brand-hover"
+            className="flex w-full items-center justify-center rounded-full bg-brand px-4 py-3.5 text-[0.9375rem] font-bold text-white no-underline transition-all duration-200 ease-in-out hover:-translate-y-0.5 hover:bg-brand-hover hover:shadow-md active:scale-[0.98]"
           >
             View my appointments
           </Link>

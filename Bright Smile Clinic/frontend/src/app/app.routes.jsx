@@ -7,7 +7,15 @@ import PendingApproval from '../features/auth/pages/PendingApproval';
 import AdminLogin from '../features/auth/pages/AdminLogin';
 import PatientDashboard from '../features/patient/pages/PatientDashboard';
 import DoctorDashboard from '../features/doctor/pages/DoctorDashboard';
+import AppointmentRequests from '../features/doctor/pages/AppointmentRequests';
+import MyAvailability from '../features/doctor/pages/MyAvailability';
+import ProfileEdit from '../features/doctor/pages/ProfileEdit';
+import PatientHistory from '../features/doctor/pages/PatientHistory';
 import AdminDashboard from '../features/admin/pages/AdminDashboard';
+import PendingDoctors from '../features/admin/pages/PendingDoctors';
+import ManageServices from '../features/admin/pages/ManageServices';
+import KnowledgeBase from '../features/admin/pages/KnowledgeBase';
+import AllAppointments from '../features/admin/pages/AllAppointments';
 import BookAppointment from '../features/booking/pages/BookAppointment';
 import MyAppointments from '../features/booking/pages/MyAppointments';
 import BookingConfirmation from '../features/booking/pages/BookingConfirmation';
@@ -42,10 +50,74 @@ const router = createBrowserRouter([
     ),
   },
   {
+    path: '/doctor/appointment-requests',
+    element: (
+      <ProtectedRoute roles={['doctor']}>
+        <AppointmentRequests />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/doctor/availability',
+    element: (
+      <ProtectedRoute roles={['doctor']}>
+        <MyAvailability />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/doctor/patient-history',
+    element: (
+      <ProtectedRoute roles={['doctor']}>
+        <PatientHistory />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/doctor/profile',
+    element: (
+      <ProtectedRoute roles={['doctor']}>
+        <ProfileEdit />
+      </ProtectedRoute>
+    ),
+  },
+  {
     path: '/admin/dashboard',
     element: (
       <ProtectedRoute roles={['admin']}>
         <AdminDashboard />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/admin/pending-doctors',
+    element: (
+      <ProtectedRoute roles={['admin']}>
+        <PendingDoctors />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/admin/manage-services',
+    element: (
+      <ProtectedRoute roles={['admin']}>
+        <ManageServices />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/admin/knowledge-base',
+    element: (
+      <ProtectedRoute roles={['admin']}>
+        <KnowledgeBase />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/admin/all-appointments',
+    element: (
+      <ProtectedRoute roles={['admin']}>
+        <AllAppointments />
       </ProtectedRoute>
     ),
   },

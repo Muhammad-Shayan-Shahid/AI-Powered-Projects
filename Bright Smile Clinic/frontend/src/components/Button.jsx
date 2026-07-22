@@ -24,7 +24,7 @@ export default function Button({
       {...(isButtonEl ? { type, disabled: isDisabled } : {})}
       className={[
         'inline-flex items-center justify-center gap-2.5 whitespace-nowrap font-bold text-[0.9375rem]',
-        'transition-all duration-150 ease-out active:scale-[0.98]',
+        'transition-all duration-200 ease-in-out enabled:hover:-translate-y-0.5 enabled:hover:shadow-md active:scale-[0.98]',
         'disabled:cursor-not-allowed disabled:opacity-75',
         'focus-visible:outline-none focus-visible:ring-[3px]',
         pill ? 'rounded-full px-7 py-3.5' : 'rounded-[10px] px-5 py-3',

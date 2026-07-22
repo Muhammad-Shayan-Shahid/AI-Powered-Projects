@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../../../components/Navbar';
 import Footer from '../../../components/Footer';
@@ -17,6 +17,12 @@ export default function DoctorLogin() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+
+  // Wipe any leftover error from a previous auth form (e.g. a failed login)
+  // so it doesn't bleed into this page on navigation.
+  useEffect(() => {
+    clearAuthError();
+  }, [clearAuthError]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -97,7 +103,7 @@ export default function DoctorLogin() {
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="rounded px-1 py-0.5 text-xs font-semibold text-ink-secondary transition-colors hover:text-ink"
+                  className="rounded px-1 py-0.5 text-xs font-semibold text-ink-secondary transition-colors duration-200 ease-in-out hover:text-ink"
                 >
                   {showPassword ? 'Hide' : 'Show'}
                 </button>
@@ -107,7 +113,7 @@ export default function DoctorLogin() {
             <div className="flex justify-end">
               <a
                 href="#"
-                className="text-[0.8125rem] font-semibold text-clinician no-underline hover:text-clinician-hover"
+                className="text-[0.8125rem] font-semibold text-clinician no-underline transition-colors duration-200 ease-in-out hover:text-clinician-hover"
               >
                 Forgot password?
               </a>
@@ -122,7 +128,7 @@ export default function DoctorLogin() {
             New provider?{' '}
             <Link
               to="/doctor/signup"
-              className="font-semibold text-clinician no-underline hover:text-clinician-hover"
+              className="font-semibold text-clinician no-underline transition-colors duration-200 ease-in-out hover:text-clinician-hover"
             >
               Apply to join
             </Link>

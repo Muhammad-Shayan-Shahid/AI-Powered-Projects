@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Card from '../../../components/Card';
 import Input from '../../../components/Input';
@@ -11,6 +11,12 @@ export default function AdminLogin() {
   const { loginAdmin, isLoading, error, fieldErrors, clearAuthError } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  // Wipe any leftover error from a previous auth form (e.g. a failed login)
+  // so it doesn't bleed into this page on navigation.
+  useEffect(() => {
+    clearAuthError();
+  }, [clearAuthError]);
 
   async function handleSubmit(e) {
     e.preventDefault();

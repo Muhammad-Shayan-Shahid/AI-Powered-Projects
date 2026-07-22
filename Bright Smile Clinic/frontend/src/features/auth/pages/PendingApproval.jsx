@@ -36,7 +36,10 @@ export default function PendingApproval() {
             <Button as={Link} to="/" tone="brand" className="no-underline">
               Back to home
             </Button>
-            <a href="#" className="text-sm font-semibold text-clinician no-underline hover:text-clinician-hover">
+            <a
+              href="#"
+              className="text-sm font-semibold text-clinician no-underline transition-colors duration-200 ease-in-out hover:text-clinician-hover"
+            >
               Contact support
             </a>
           </div>

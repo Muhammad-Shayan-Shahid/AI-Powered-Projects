@@ -14,4 +14,8 @@ const createAppointmentSchema = z.object({
   timeSlot: timeOfDay,
 });
 
-module.exports = { availableSlotsQuerySchema, createAppointmentSchema };
+const rejectAppointmentSchema = z.object({
+  reason: z.string().trim().optional(),
+});
+
+module.exports = { availableSlotsQuerySchema, createAppointmentSchema, rejectAppointmentSchema };

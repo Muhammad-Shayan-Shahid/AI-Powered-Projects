@@ -9,4 +9,7 @@ module.exports = {
   JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN,
   NODE_ENV: process.env.NODE_ENV || 'development',
   CLIENT_URL: process.env.CLIENT_URL || 'http://localhost:5173',
+  RESEND_API_KEY: process.env.RESEND_API_KEY,
+  // Resend's shared sandbox sender — swap for a verified clinic domain before production.
+  EMAIL_FROM: process.env.EMAIL_FROM || 'Bright Smile Clinic <onboarding@resend.dev>',
 };

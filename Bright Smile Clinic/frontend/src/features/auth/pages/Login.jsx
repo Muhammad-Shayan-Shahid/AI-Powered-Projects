@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../../../components/Navbar';
 import Footer from '../../../components/Footer';
@@ -14,6 +14,12 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+
+  // Wipe any leftover error from a previous auth form (e.g. a failed login)
+  // so it doesn't bleed into this page on navigation.
+  useEffect(() => {
+    clearAuthError();
+  }, [clearAuthError]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -97,7 +103,7 @@ export default function Login() {
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="rounded px-1 py-0.5 text-xs font-semibold text-ink-secondary transition-colors hover:text-ink"
+                  className="rounded px-1 py-0.5 text-xs font-semibold text-ink-secondary transition-colors duration-200 ease-in-out hover:text-ink"
                 >
                   {showPassword ? 'Hide' : 'Show'}
                 </button>
@@ -105,7 +111,10 @@ export default function Login() {
             />
 
             <div className="flex justify-end">
-              <a href="#" className="text-[0.8125rem] font-semibold text-brand no-underline hover:text-brand-hover">
+              <a
+                href="#"
+                className="text-[0.8125rem] font-semibold text-brand no-underline transition-colors duration-200 ease-in-out hover:text-brand-hover"
+              >
                 Forgot password?
               </a>
             </div>
@@ -123,7 +132,10 @@ export default function Login() {
 
           <p className="m-0 text-center text-[0.9375rem] text-ink-secondary">
             New to Bright Smile?{' '}
-            <Link to="/signup" className="font-semibold text-brand no-underline hover:text-brand-hover">
+            <Link
+              to="/signup"
+              className="font-semibold text-brand no-underline transition-colors duration-200 ease-in-out hover:text-brand-hover"
+            >
               Create an account
             </Link>
           </p>

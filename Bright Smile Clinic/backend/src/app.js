@@ -7,6 +7,9 @@ const serviceRoutes = require('./routes/service.routes');
 const doctorRoutes = require('./routes/doctor.routes');
 const availabilityRoutes = require('./routes/availability.routes');
 const appointmentRoutes = require('./routes/appointment.routes');
+const userRoutes = require('./routes/user.routes');
+const adminRoutes = require('./routes/admin.routes');
+const documentRoutes = require('./routes/document.routes');
 
 const app = express();
 
@@ -26,6 +29,9 @@ app.use('/api/services', serviceRoutes);
 app.use('/api/doctors', doctorRoutes);
 app.use('/api/availability', availabilityRoutes);
 app.use('/api/appointments', appointmentRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/admin/documents', documentRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Catch-all for unmatched routes.
 app.use((req, res) => {

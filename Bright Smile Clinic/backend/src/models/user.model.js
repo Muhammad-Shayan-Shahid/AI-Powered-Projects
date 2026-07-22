@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['active', 'pending'],
+      enum: ['active', 'pending', 'rejected'],
       default: 'active',
     },
     // Doctor-only fields

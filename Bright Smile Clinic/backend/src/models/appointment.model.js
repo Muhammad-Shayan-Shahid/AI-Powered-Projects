@@ -39,6 +39,11 @@ const appointmentSchema = new mongoose.Schema(
       enum: ['not_required', 'pending', 'paid'],
       default: 'not_required',
     },
+    // Optional note a doctor can leave when rejecting a pending request.
+    rejectionReason: {
+      type: String,
+      trim: true,
+    },
   },
   { timestamps: true }
 );

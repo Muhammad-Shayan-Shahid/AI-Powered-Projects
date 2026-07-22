@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../../../components/Navbar';
 import Footer from '../../../components/Footer';
@@ -18,6 +18,12 @@ export default function Signup() {
   const { registerPatient, isLoading, error, fieldErrors, clearAuthError } = useAuth();
   const [fields, setFields] = useState({ name: '', email: '', phone: '', password: '', confirm: '' });
   const [touched, setTouched] = useState({});
+
+  // Wipe any leftover error from a previous auth form (e.g. a failed login)
+  // so it doesn't bleed into this page on navigation.
+  useEffect(() => {
+    clearAuthError();
+  }, [clearAuthError]);
 
   function update(field, value) {
     setFields((f) => ({ ...f, [field]: value }));
@@ -152,7 +158,10 @@ export default function Signup() {
 
           <p className="m-0 text-center text-[0.9375rem] text-ink-secondary">
             Already have an account?{' '}
-            <Link to="/login" className="font-semibold text-brand no-underline hover:text-brand-hover">
+            <Link
+              to="/login"
+              className="font-semibold text-brand no-underline transition-colors duration-200 ease-in-out hover:text-brand-hover"
+            >
               Log in
             </Link>
           </p>

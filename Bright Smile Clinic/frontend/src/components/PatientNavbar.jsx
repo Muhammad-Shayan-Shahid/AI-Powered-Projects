@@ -25,7 +25,9 @@ export default function PatientNavbar() {
             <Link
               key={link.to}
               to={link.to}
-              className={`text-sm no-underline ${active ? 'font-bold text-brand' : 'font-medium text-ink'}`}
+              className={`text-sm no-underline transition-colors duration-200 ease-in-out ${
+                active ? 'font-bold text-brand' : 'font-medium text-ink hover:text-brand'
+              }`}
             >
               {link.label}
             </Link>

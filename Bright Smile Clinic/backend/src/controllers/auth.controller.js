@@ -98,6 +98,16 @@ function login(role) {
         });
       }
 
+      // A rejected doctor must never receive a session cookie — otherwise
+      // rejection is purely cosmetic and they'd still reach the dashboard.
+      if (role === 'doctor' && user.status === 'rejected') {
+        return res.status(403).json({
+          success: false,
+          data: null,
+          message: 'Your doctor account application was not approved. Please contact the clinic.',
+        });
+      }
+
       const token = signToken(user._id);
       setAuthCookie(res, token);
 
@@ -127,4 +137,5 @@ module.exports = {
   login,
   logout,
   getMe,
+  sanitizeUser,
 };

@@ -1,7 +1,10 @@
 import { useEffect } from 'react';
 import { Provider } from 'react-redux';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { store } from './app.store';
 import AppRoutes from './app.routes';
+import NotificationListener from './NotificationListener';
 import { useAuth } from '../features/auth/hooks/useAuth';
 import './app.css';
 
@@ -22,7 +25,9 @@ export default function App() {
   return (
     <Provider store={store}>
       <AuthBootstrap>
+        <NotificationListener />
         <AppRoutes />
+        <ToastContainer position="top-right" autoClose={5000} />
       </AuthBootstrap>
     </Provider>
   );
