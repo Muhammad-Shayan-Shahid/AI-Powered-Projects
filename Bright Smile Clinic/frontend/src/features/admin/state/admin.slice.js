@@ -42,6 +42,24 @@ export const fetchActiveDoctors = createAsyncThunk('admin/fetchActiveDoctors', a
   }
 });
 
+export const featureDoctor = createAsyncThunk('admin/featureDoctor', async (id, thunkAPI) => {
+  try {
+    const data = await adminService.featureDoctor(id);
+    return { id, doctor: data.doctor };
+  } catch (error) {
+    return thunkAPI.rejectWithValue({ id, message: error.message });
+  }
+});
+
+export const deactivateDoctor = createAsyncThunk('admin/deactivateDoctor', async (id, thunkAPI) => {
+  try {
+    const data = await adminService.deactivateDoctor(id);
+    return { id, doctor: data.doctor };
+  } catch (error) {
+    return thunkAPI.rejectWithValue({ id, message: error.message });
+  }
+});
+
 export const fetchServices = createAsyncThunk('admin/fetchServices', async (_, thunkAPI) => {
   try {
     return await adminService.listServices();
@@ -127,6 +145,7 @@ const initialState = {
 
   activeDoctors: [],
   isLoadingActiveDoctors: false,
+  togglingDoctorIds: [],
 
   services: [],
   isLoadingServices: false,
@@ -236,6 +255,40 @@ const adminSlice = createSlice({
       })
       .addCase(fetchActiveDoctors.rejected, (state) => {
         state.isLoadingActiveDoctors = false;
+      })
+
+      // Feature/deactivate patch the matching row in place rather than
+      // refetching — mirrors approveDoctor/rejectDoctor's in-place pattern above.
+      .addCase(featureDoctor.pending, (state, action) => {
+        state.togglingDoctorIds.push(action.meta.arg);
+        state.doctorActionError = null;
+      })
+      .addCase(featureDoctor.fulfilled, (state, action) => {
+        state.togglingDoctorIds = state.togglingDoctorIds.filter((id) => id !== action.payload.id);
+        const idx = state.activeDoctors.findIndex((d) => d._id === action.payload.id);
+        if (idx !== -1) state.activeDoctors[idx] = { ...state.activeDoctors[idx], featured: action.payload.doctor.featured };
+      })
+      .addCase(featureDoctor.rejected, (state, action) => {
+        state.togglingDoctorIds = state.togglingDoctorIds.filter((id) => id !== action.payload?.id);
+        state.doctorActionError = action.payload?.message || 'Could not update featured status.';
+      })
+
+      // Deactivated doctors are kept in `activeDoctors` (status flipped, not
+      // removed) so the row can dim + offer "Reactivate" in place, matching
+      // the design — a real refetch would drop them since GET /doctors only
+      // ever returns status: active.
+      .addCase(deactivateDoctor.pending, (state, action) => {
+        state.togglingDoctorIds.push(action.meta.arg);
+        state.doctorActionError = null;
+      })
+      .addCase(deactivateDoctor.fulfilled, (state, action) => {
+        state.togglingDoctorIds = state.togglingDoctorIds.filter((id) => id !== action.payload.id);
+        const idx = state.activeDoctors.findIndex((d) => d._id === action.payload.id);
+        if (idx !== -1) state.activeDoctors[idx] = { ...state.activeDoctors[idx], status: action.payload.doctor.status };
+      })
+      .addCase(deactivateDoctor.rejected, (state, action) => {
+        state.togglingDoctorIds = state.togglingDoctorIds.filter((id) => id !== action.payload?.id);
+        state.doctorActionError = action.payload?.message || 'Could not update this doctor.';
       })
 
       .addCase(fetchServices.pending, (state) => {

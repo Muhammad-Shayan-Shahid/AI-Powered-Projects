@@ -5,6 +5,8 @@ import {
   approveDoctor,
   rejectDoctor,
   fetchActiveDoctors,
+  featureDoctor,
+  deactivateDoctor,
   fetchServices,
   createService,
   updateService,
@@ -38,6 +40,7 @@ export function useAdmin() {
 
     activeDoctors: admin.activeDoctors,
     isLoadingActiveDoctors: admin.isLoadingActiveDoctors,
+    togglingDoctorIds: admin.togglingDoctorIds,
 
     services: admin.services,
     isLoadingServices: admin.isLoadingServices,
@@ -61,6 +64,8 @@ export function useAdmin() {
     rejectDoctor: useCallback((id, reason) => dispatch(rejectDoctor({ id, reason })), [dispatch]),
 
     fetchActiveDoctors: useCallback(() => dispatch(fetchActiveDoctors()), [dispatch]),
+    featureDoctor: useCallback((id) => dispatch(featureDoctor(id)), [dispatch]),
+    deactivateDoctor: useCallback((id) => dispatch(deactivateDoctor(id)), [dispatch]),
 
     fetchServices: useCallback(() => dispatch(fetchServices()), [dispatch]),
     createService: useCallback((payload) => dispatch(createService(payload)), [dispatch]),

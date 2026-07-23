@@ -94,4 +94,75 @@ async function listAllAppointments(req, res, next) {
   }
 }
 
-module.exports = { listPendingDoctors, approveDoctor, rejectDoctor, listAllAppointments };
+// Toggles the admin-controlled "featured" spotlight flag on the public
+// doctor directory. Any doctor record works here regardless of status —
+// featuring only has a visible effect once they're active anyway.
+async function featureDoctor(req, res, next) {
+  try {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ success: false, data: null, message: 'Invalid doctor id.' });
+    }
+
+    const doctor = await User.findOne({ _id: id, role: 'doctor' });
+    if (!doctor) {
+      return res.status(404).json({ success: false, data: null, message: 'Doctor not found.' });
+    }
+
+    doctor.featured = !doctor.featured;
+    await doctor.save();
+
+    return res.status(200).json({
+      success: true,
+      data: { doctor: sanitizeUser(doctor) },
+      message: doctor.featured ? 'Doctor marked as featured.' : 'Doctor removed from featured.',
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+// Toggles a doctor between active and deactivated. A deactivated doctor is
+// blocked at login (mirrors the rejected-status check in auth.controller.js)
+// and drops out of the public doctor directory (listDoctors/getDoctor only
+// return status: 'active'), but the record itself is kept so admin can
+// reactivate later — this is not the same as reject, which only applies to
+// still-pending applications.
+async function deactivateDoctor(req, res, next) {
+  try {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ success: false, data: null, message: 'Invalid doctor id.' });
+    }
+
+    const doctor = await User.findOne({ _id: id, role: 'doctor' });
+    if (!doctor) {
+      return res.status(404).json({ success: false, data: null, message: 'Doctor not found.' });
+    }
+    if (doctor.status !== 'active' && doctor.status !== 'deactivated') {
+      return res
+        .status(400)
+        .json({ success: false, data: null, message: 'Only active or deactivated doctors can be toggled here.' });
+    }
+
+    doctor.status = doctor.status === 'active' ? 'deactivated' : 'active';
+    await doctor.save();
+
+    return res.status(200).json({
+      success: true,
+      data: { doctor: sanitizeUser(doctor) },
+      message: doctor.status === 'active' ? 'Doctor reactivated.' : 'Doctor deactivated.',
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+module.exports = {
+  listPendingDoctors,
+  approveDoctor,
+  rejectDoctor,
+  featureDoctor,
+  deactivateDoctor,
+  listAllAppointments,
+};

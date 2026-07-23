@@ -16,9 +16,19 @@ export const fetchServices = createAsyncThunk('booking/fetchServices', async (_,
   }
 });
 
-export const fetchDoctors = createAsyncThunk('booking/fetchDoctors', async (_, thunkAPI) => {
+// `service` is optional — omitted, this returns every active doctor (used by
+// Home/BookAppointment); passed, the backend filters by specialization.
+export const fetchDoctors = createAsyncThunk('booking/fetchDoctors', async (service, thunkAPI) => {
   try {
-    return await bookingService.listDoctors();
+    return await bookingService.listDoctors(service);
+  } catch (error) {
+    return rejectWithBookingError(error, thunkAPI);
+  }
+});
+
+export const fetchDoctorById = createAsyncThunk('booking/fetchDoctorById', async (id, thunkAPI) => {
+  try {
+    return await bookingService.getDoctor(id);
   } catch (error) {
     return rejectWithBookingError(error, thunkAPI);
   }
@@ -66,6 +76,10 @@ const initialState = {
   isLoadingCatalog: false,
   catalogError: null,
 
+  selectedDoctor: null,
+  isLoadingDoctor: false,
+  doctorError: null,
+
   slots: [],
   isLoadingSlots: false,
   slotsError: null,
@@ -94,6 +108,10 @@ const bookingSlice = createSlice({
       state.bookingConflict = false;
       state.bookingError = null;
     },
+    clearSelectedDoctor(state) {
+      state.selectedDoctor = null;
+      state.doctorError = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -121,6 +139,20 @@ const bookingSlice = createSlice({
       .addCase(fetchDoctors.rejected, (state, action) => {
         state.isLoadingCatalog = false;
         state.catalogError = action.payload?.message || 'Could not load doctors.';
+      })
+
+      .addCase(fetchDoctorById.pending, (state) => {
+        state.isLoadingDoctor = true;
+        state.doctorError = null;
+      })
+      .addCase(fetchDoctorById.fulfilled, (state, action) => {
+        state.isLoadingDoctor = false;
+        state.selectedDoctor = action.payload.doctor;
+      })
+      .addCase(fetchDoctorById.rejected, (state, action) => {
+        state.isLoadingDoctor = false;
+        state.selectedDoctor = null;
+        state.doctorError = action.payload?.message || 'Could not load this doctor.';
       })
 
       .addCase(fetchAvailableSlots.pending, (state) => {
@@ -180,5 +212,5 @@ const bookingSlice = createSlice({
   },
 });
 
-export const { clearSlots, clearBookingConflict } = bookingSlice.actions;
+export const { clearSlots, clearBookingConflict, clearSelectedDoctor } = bookingSlice.actions;
 export default bookingSlice.reducer;

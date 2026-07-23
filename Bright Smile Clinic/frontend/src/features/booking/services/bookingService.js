@@ -25,7 +25,8 @@ async function request(path, options = {}) {
 
 export const bookingService = {
   listServices: () => request('/services'),
-  listDoctors: () => request('/doctors'),
+  listDoctors: (service) => request(`/doctors${service ? `?service=${encodeURIComponent(service)}` : ''}`),
+  getDoctor: (id) => request(`/doctors/${id}`),
   getAvailableSlots: ({ doctorId, serviceId, date }) =>
     request(`/appointments/available-slots?doctorId=${doctorId}&serviceId=${serviceId}&date=${date}`),
   createAppointment: (payload) => request('/appointments', { method: 'POST', body: payload }),

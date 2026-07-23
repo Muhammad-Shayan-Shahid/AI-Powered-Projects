@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['active', 'pending', 'rejected'],
+      enum: ['active', 'pending', 'rejected', 'deactivated'],
       default: 'active',
     },
     // Doctor-only fields
@@ -47,6 +47,11 @@ const userSchema = new mongoose.Schema(
     photoUrl: {
       type: String,
       trim: true,
+    },
+    // Doctor-only: admin-controlled spotlight flag for the public doctor directory.
+    featured: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }

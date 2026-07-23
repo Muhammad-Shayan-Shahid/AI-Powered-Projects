@@ -11,6 +11,8 @@ router.use(verifyToken, requireRole('admin'));
 router.get('/doctors/pending', adminController.listPendingDoctors);
 router.patch('/doctors/:id/approve', adminController.approveDoctor);
 router.patch('/doctors/:id/reject', validate(rejectDoctorSchema), adminController.rejectDoctor);
+router.patch('/doctors/:id/feature', adminController.featureDoctor);
+router.patch('/doctors/:id/deactivate', adminController.deactivateDoctor);
 
 router.get('/appointments', validateQuery(appointmentsQuerySchema), adminController.listAllAppointments);
 

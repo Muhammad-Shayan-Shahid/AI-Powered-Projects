@@ -40,6 +40,8 @@ export const adminService = {
   rejectDoctor: (id, reason) => request(`/admin/doctors/${id}/reject`, { method: 'PATCH', body: { reason } }),
 
   listActiveDoctors: () => request('/doctors'),
+  featureDoctor: (id) => request(`/admin/doctors/${id}/feature`, { method: 'PATCH' }),
+  deactivateDoctor: (id) => request(`/admin/doctors/${id}/deactivate`, { method: 'PATCH' }),
 
   listServices: () => request('/services'),
   createService: (payload) => request('/services', { method: 'POST', body: payload }),

@@ -1,4 +1,8 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import Home from '../features/public/pages/Home';
+import BrowseDoctors from '../features/public/pages/BrowseDoctors';
+import DoctorProfile from '../features/public/pages/DoctorProfile';
+import BrowseServices from '../features/public/pages/BrowseServices';
 import Login from '../features/auth/pages/Login';
 import Signup from '../features/auth/pages/Signup';
 import DoctorLogin from '../features/auth/pages/DoctorLogin';
@@ -13,6 +17,7 @@ import ProfileEdit from '../features/doctor/pages/ProfileEdit';
 import PatientHistory from '../features/doctor/pages/PatientHistory';
 import AdminDashboard from '../features/admin/pages/AdminDashboard';
 import PendingDoctors from '../features/admin/pages/PendingDoctors';
+import ManageDoctors from '../features/admin/pages/ManageDoctors';
 import ManageServices from '../features/admin/pages/ManageServices';
 import KnowledgeBase from '../features/admin/pages/KnowledgeBase';
 import AllAppointments from '../features/admin/pages/AllAppointments';
@@ -21,12 +26,11 @@ import MyAppointments from '../features/booking/pages/MyAppointments';
 import BookingConfirmation from '../features/booking/pages/BookingConfirmation';
 import ProtectedRoute from './ProtectedRoute';
 
-function Home() {
-  return <p>Frontend connected</p>;
-}
-
 const router = createBrowserRouter([
   { path: '/', element: <Home /> },
+  { path: '/doctors', element: <BrowseDoctors /> },
+  { path: '/doctors/:id', element: <DoctorProfile /> },
+  { path: '/services', element: <BrowseServices /> },
   { path: '/login', element: <Login /> },
   { path: '/signup', element: <Signup /> },
   { path: '/doctor/login', element: <DoctorLogin /> },
@@ -94,6 +98,14 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute roles={['admin']}>
         <PendingDoctors />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/admin/manage-doctors',
+    element: (
+      <ProtectedRoute roles={['admin']}>
+        <ManageDoctors />
       </ProtectedRoute>
     ),
   },

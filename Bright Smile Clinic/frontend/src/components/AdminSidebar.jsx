@@ -5,6 +5,7 @@ import { useAuth } from '../features/auth/hooks/useAuth';
 const NAV_LINKS = [
   { label: 'Dashboard', to: '/admin/dashboard' },
   { label: 'Pending doctors', to: '/admin/pending-doctors' },
+  { label: 'Manage doctors', to: '/admin/manage-doctors' },
   { label: 'Manage services', to: '/admin/manage-services' },
   { label: 'Knowledge base', to: '/admin/knowledge-base' },
   { label: 'All appointments', to: '/admin/all-appointments' },

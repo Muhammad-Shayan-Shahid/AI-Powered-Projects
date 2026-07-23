@@ -3,12 +3,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchServices,
   fetchDoctors,
+  fetchDoctorById,
   fetchAvailableSlots,
   createAppointment,
   fetchMyAppointments,
   cancelAppointment,
   clearSlots,
   clearBookingConflict,
+  clearSelectedDoctor,
 } from '../state/booking.slice';
 
 // Wraps the booking slice so pages never touch dispatch/thunks directly.
@@ -21,6 +23,10 @@ export function useBooking() {
     doctors: booking.doctors,
     isLoadingCatalog: booking.isLoadingCatalog,
     catalogError: booking.catalogError,
+
+    selectedDoctor: booking.selectedDoctor,
+    isLoadingDoctor: booking.isLoadingDoctor,
+    doctorError: booking.doctorError,
 
     slots: booking.slots,
     isLoadingSlots: booking.isLoadingSlots,
@@ -38,7 +44,9 @@ export function useBooking() {
     cancelError: booking.cancelError,
 
     fetchServices: useCallback(() => dispatch(fetchServices()), [dispatch]),
-    fetchDoctors: useCallback(() => dispatch(fetchDoctors()), [dispatch]),
+    fetchDoctors: useCallback((service) => dispatch(fetchDoctors(service)), [dispatch]),
+    fetchDoctorById: useCallback((id) => dispatch(fetchDoctorById(id)), [dispatch]),
+    clearSelectedDoctor: useCallback(() => dispatch(clearSelectedDoctor()), [dispatch]),
     fetchAvailableSlots: useCallback((params) => dispatch(fetchAvailableSlots(params)), [dispatch]),
     createAppointment: useCallback((payload) => dispatch(createAppointment(payload)), [dispatch]),
     fetchMyAppointments: useCallback(() => dispatch(fetchMyAppointments()), [dispatch]),

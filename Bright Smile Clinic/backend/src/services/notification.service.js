@@ -7,8 +7,23 @@ const {
   sendDoctorRejectedEmail,
 } = require('./email.service');
 
-function emitToUser(userId, event, message, data) {
-  getIO().to(String(userId)).emit(event, { message, data, timestamp: new Date().toISOString() });
+// Socket emit and email send are independent channels — one failing must
+// never prevent the other from running, so each gets its own try/catch
+// instead of sharing one around both calls.
+function emitToUser(event, userId, message, data) {
+  try {
+    getIO().to(String(userId)).emit(event, { message, data, timestamp: new Date().toISOString() });
+  } catch (error) {
+    console.warn(`Failed to emit socket event "${event}" to user ${userId}:`, error);
+  }
+}
+
+async function sendEmailSafe(label, sendFn) {
+  try {
+    await sendFn();
+  } catch (error) {
+    console.warn(`Failed to send "${label}" email:`, error);
+  }
 }
 
 // appointment.date is stored as a UTC-midnight Date (see appointment.model.js);
@@ -23,16 +38,18 @@ async function notifyAppointmentCreated({ appointment, doctor, patient, service 
   const dateLabel = formatDateLabel(appointment.date);
   const message = `${patient.name} requested a ${service.name} appointment on ${dateLabel} at ${appointment.timeSlot}.`;
 
-  emitToUser(doctor._id, 'appointment:created', message, { appointmentId: appointment._id });
+  emitToUser('appointment:created', doctor._id, message, { appointmentId: appointment._id });
 
-  await sendAppointmentCreatedEmail({
-    to: doctor.email,
-    doctorName: doctor.name,
-    patientName: patient.name,
-    serviceName: service.name,
-    dateLabel,
-    timeSlot: appointment.timeSlot,
-  });
+  await sendEmailSafe('appointment:created', () =>
+    sendAppointmentCreatedEmail({
+      to: doctor.email,
+      doctorName: doctor.name,
+      patientName: patient.name,
+      serviceName: service.name,
+      dateLabel,
+      timeSlot: appointment.timeSlot,
+    })
+  );
 }
 
 async function notifyAppointmentConfirmed({ appointment, doctor }) {
@@ -41,16 +58,18 @@ async function notifyAppointmentConfirmed({ appointment, doctor }) {
   const dateLabel = formatDateLabel(appointment.date);
   const message = `Dr. ${doctor.name} confirmed your ${service.name} appointment on ${dateLabel} at ${appointment.timeSlot}.`;
 
-  emitToUser(patient._id, 'appointment:confirmed', message, { appointmentId: appointment._id });
+  emitToUser('appointment:confirmed', patient._id, message, { appointmentId: appointment._id });
 
-  await sendAppointmentConfirmedEmail({
-    to: patient.email,
-    patientName: patient.name,
-    doctorName: doctor.name,
-    serviceName: service.name,
-    dateLabel,
-    timeSlot: appointment.timeSlot,
-  });
+  await sendEmailSafe('appointment:confirmed', () =>
+    sendAppointmentConfirmedEmail({
+      to: patient.email,
+      patientName: patient.name,
+      doctorName: doctor.name,
+      serviceName: service.name,
+      dateLabel,
+      timeSlot: appointment.timeSlot,
+    })
+  );
 }
 
 async function notifyAppointmentRejected({ appointment, doctor }) {
@@ -60,20 +79,22 @@ async function notifyAppointmentRejected({ appointment, doctor }) {
   const reasonSuffix = appointment.rejectionReason ? ` Reason: ${appointment.rejectionReason}` : '';
   const message = `Dr. ${doctor.name} could not accept your ${service.name} appointment on ${dateLabel} at ${appointment.timeSlot}.${reasonSuffix}`;
 
-  emitToUser(patient._id, 'appointment:rejected', message, {
+  emitToUser('appointment:rejected', patient._id, message, {
     appointmentId: appointment._id,
     rejectionReason: appointment.rejectionReason || null,
   });
 
-  await sendAppointmentRejectedEmail({
-    to: patient.email,
-    patientName: patient.name,
-    doctorName: doctor.name,
-    serviceName: service.name,
-    dateLabel,
-    timeSlot: appointment.timeSlot,
-    rejectionReason: appointment.rejectionReason,
-  });
+  await sendEmailSafe('appointment:rejected', () =>
+    sendAppointmentRejectedEmail({
+      to: patient.email,
+      patientName: patient.name,
+      doctorName: doctor.name,
+      serviceName: service.name,
+      dateLabel,
+      timeSlot: appointment.timeSlot,
+      rejectionReason: appointment.rejectionReason,
+    })
+  );
 }
 
 // Callers fire these without awaiting (see admin.controller.js) so a slow or
@@ -81,18 +102,20 @@ async function notifyAppointmentRejected({ appointment, doctor }) {
 async function notifyDoctorApproved({ doctor }) {
   const message = 'Your doctor account has been approved. You can now log in and access your dashboard.';
 
-  emitToUser(doctor._id, 'doctor:approved', message, { doctorId: doctor._id });
+  emitToUser('doctor:approved', doctor._id, message, { doctorId: doctor._id });
 
-  await sendDoctorApprovedEmail({ to: doctor.email, doctorName: doctor.name });
+  await sendEmailSafe('doctor:approved', () => sendDoctorApprovedEmail({ to: doctor.email, doctorName: doctor.name }));
 }
 
 async function notifyDoctorRejected({ doctor, reason }) {
   const reasonSuffix = reason ? ` Reason: ${reason}` : '';
   const message = `Your doctor account application was not approved.${reasonSuffix}`;
 
-  emitToUser(doctor._id, 'doctor:rejected', message, { doctorId: doctor._id, reason: reason || null });
+  emitToUser('doctor:rejected', doctor._id, message, { doctorId: doctor._id, reason: reason || null });
 
-  await sendDoctorRejectedEmail({ to: doctor.email, doctorName: doctor.name, reason });
+  await sendEmailSafe('doctor:rejected', () =>
+    sendDoctorRejectedEmail({ to: doctor.email, doctorName: doctor.name, reason })
+  );
 }
 
 module.exports = {

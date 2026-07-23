@@ -21,8 +21,8 @@ function setAuthCookie(res, token) {
 
 // Never leak the hashed password or __v out of the API.
 function sanitizeUser(user) {
-  const { _id, name, email, phone, role, status, specialization, bio, photoUrl, createdAt } = user;
-  return { id: _id, name, email, phone, role, status, specialization, bio, photoUrl, createdAt };
+  const { _id, name, email, phone, role, status, specialization, bio, photoUrl, featured, createdAt } = user;
+  return { id: _id, name, email, phone, role, status, specialization, bio, photoUrl, featured, createdAt };
 }
 
 async function registerPatient(req, res, next) {
@@ -105,6 +105,16 @@ function login(role) {
           success: false,
           data: null,
           message: 'Your doctor account application was not approved. Please contact the clinic.',
+        });
+      }
+
+      // Same rule for a doctor an admin has since deactivated — deactivating
+      // is meaningless if the doctor can just keep logging in.
+      if (role === 'doctor' && user.status === 'deactivated') {
+        return res.status(403).json({
+          success: false,
+          data: null,
+          message: 'Your doctor account has been deactivated. Please contact the clinic.',
         });
       }
 

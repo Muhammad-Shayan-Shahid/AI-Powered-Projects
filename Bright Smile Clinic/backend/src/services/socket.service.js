@@ -18,7 +18,8 @@ function initSocket(httpServer, clientUrl) {
   io.use(async (socket, next) => {
     try {
       const rawCookie = socket.handshake.headers.cookie;
-      const token = rawCookie ? cookie.parse(rawCookie).token : null;
+      // cookie v2 renamed the default parse export to parseCookie.
+      const token = rawCookie ? cookie.parseCookie(rawCookie).token : null;
       if (!token) {
         return next(new Error('Not authenticated.'));
       }
