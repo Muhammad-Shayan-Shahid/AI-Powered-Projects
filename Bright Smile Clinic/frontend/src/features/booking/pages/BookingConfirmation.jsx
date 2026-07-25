@@ -2,6 +2,7 @@ import { Navigate, Link, useLocation } from 'react-router-dom';
 import PatientNavbar from '../../../components/PatientNavbar';
 import Footer from '../../../components/Footer';
 import { formatDateKeyShort, formatTimeLabel } from '../../../utils/dateFormat';
+import { formatDoctorName } from '../../../utils/formatDoctorName';
 
 /** Reads the just-booked appointment's details from router state (set by BookAppointment on success). */
 export default function BookingConfirmation() {
@@ -50,7 +51,7 @@ export default function BookingConfirmation() {
           <div className="flex w-full flex-col gap-1.5 rounded-[14px] bg-page px-[18px] py-4 text-left">
             <div className="flex justify-between text-[0.8125rem] font-medium text-ink-secondary">
               <span>Doctor</span>
-              <span className="text-[0.8125rem] font-bold text-ink">{doctorName}</span>
+              <span className="text-[0.8125rem] font-bold text-ink">{formatDoctorName(doctorName)}</span>
             </div>
             <div className="flex justify-between text-[0.8125rem] font-medium text-ink-secondary">
               <span>Service</span>

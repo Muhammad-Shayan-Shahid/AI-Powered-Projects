@@ -1,5 +1,6 @@
 const { Resend } = require('resend');
 const { RESEND_API_KEY, EMAIL_FROM } = require('../config/config');
+const { formatDoctorName } = require('../utils/formatDoctorName');
 
 const resend = new Resend(RESEND_API_KEY);
 
@@ -17,7 +18,7 @@ function sendAppointmentCreatedEmail({ to, doctorName, patientName, serviceName,
   return sendEmail({
     to,
     subject: `New appointment request from ${patientName}`,
-    text: `Hi Dr. ${doctorName},\n\n${patientName} has requested a ${serviceName} appointment on ${dateLabel} at ${timeSlot}.\n\nLog in to your dashboard to confirm or reject this request.`,
+    text: `Hi ${formatDoctorName(doctorName)},\n\n${patientName} has requested a ${serviceName} appointment on ${dateLabel} at ${timeSlot}.\n\nLog in to your dashboard to confirm or reject this request.`,
   });
 }
 
@@ -25,7 +26,7 @@ function sendAppointmentConfirmedEmail({ to, patientName, doctorName, serviceNam
   return sendEmail({
     to,
     subject: 'Your appointment is confirmed',
-    text: `Hi ${patientName},\n\nDr. ${doctorName} has confirmed your ${serviceName} appointment on ${dateLabel} at ${timeSlot}.\n\nWe look forward to seeing you.`,
+    text: `Hi ${patientName},\n\n${formatDoctorName(doctorName)} has confirmed your ${serviceName} appointment on ${dateLabel} at ${timeSlot}.\n\nWe look forward to seeing you.`,
   });
 }
 
@@ -34,7 +35,7 @@ function sendAppointmentRejectedEmail({ to, patientName, doctorName, serviceName
   return sendEmail({
     to,
     subject: 'Update on your appointment request',
-    text: `Hi ${patientName},\n\nDr. ${doctorName} was unable to accept your ${serviceName} appointment request for ${dateLabel} at ${timeSlot}.${reasonLine}\n\nPlease log in to book another time.`,
+    text: `Hi ${patientName},\n\n${formatDoctorName(doctorName)} was unable to accept your ${serviceName} appointment request for ${dateLabel} at ${timeSlot}.${reasonLine}\n\nPlease log in to book another time.`,
   });
 }
 
@@ -42,7 +43,7 @@ function sendDoctorApprovedEmail({ to, doctorName }) {
   return sendEmail({
     to,
     subject: 'Your Bright Smile Clinic account is approved',
-    text: `Hi Dr. ${doctorName},\n\nYour doctor account has been approved. You can now log in and access your dashboard.`,
+    text: `Hi ${formatDoctorName(doctorName)},\n\nYour doctor account has been approved. You can now log in and access your dashboard.`,
   });
 }
 
@@ -51,7 +52,7 @@ function sendDoctorRejectedEmail({ to, doctorName, reason }) {
   return sendEmail({
     to,
     subject: 'Update on your Bright Smile Clinic application',
-    text: `Hi Dr. ${doctorName},\n\nWe were unable to approve your doctor account application.${reasonLine}\n\nPlease contact the clinic if you have questions.`,
+    text: `Hi ${formatDoctorName(doctorName)},\n\nWe were unable to approve your doctor account application.${reasonLine}\n\nPlease contact the clinic if you have questions.`,
   });
 }
 

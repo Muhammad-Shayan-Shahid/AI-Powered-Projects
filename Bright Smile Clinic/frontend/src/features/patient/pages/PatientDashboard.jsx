@@ -8,6 +8,7 @@ import FormAlert from '../../../components/FormAlert';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useBooking } from '../../booking/hooks/useBooking';
 import { getInitials } from '../../../utils/getInitials';
+import { formatDoctorName } from '../../../utils/formatDoctorName';
 import { formatAppointmentDateTime, formatRelativeTime, isFutureAppointment } from '../../../utils/dateFormat';
 
 // Dot color for the recent-activity feed — mirrors Badge's status tones.
@@ -20,7 +21,7 @@ const ACTIVITY_DOT_CLASS = {
 };
 
 function doctorLabel(name) {
-  return name ? `Dr. ${name}` : 'your doctor';
+  return name ? formatDoctorName(name) : 'your doctor';
 }
 
 function activityText(appt) {

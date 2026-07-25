@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../features/auth/hooks/useAuth';
 import { getInitials } from '../utils/getInitials';
+import { formatDoctorName } from '../utils/formatDoctorName';
 
 const NAV_LINKS = [
   { label: 'Dashboard', to: '/doctor/dashboard' },
@@ -84,7 +85,7 @@ export default function DoctorSidebar() {
         </div>
         <div className="min-w-0 flex-1">
           <div className="overflow-hidden text-ellipsis whitespace-nowrap text-[0.8125rem] font-bold">
-            Dr. {user?.name}
+            {formatDoctorName(user?.name)}
           </div>
           <div className="text-xs text-white/60">{user?.specialization || 'Specialization not set'}</div>
         </div>

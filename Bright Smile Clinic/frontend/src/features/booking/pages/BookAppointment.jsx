@@ -7,6 +7,7 @@ import FormAlert from '../../../components/FormAlert';
 import DoctorAvatar from '../../../components/DoctorAvatar';
 import { useBooking } from '../hooks/useBooking';
 import { getInitials } from '../../../utils/getInitials';
+import { formatDoctorName } from '../../../utils/formatDoctorName';
 import { formatDateKey, formatDateLabel, formatTimeLabel } from '../../../utils/dateFormat';
 
 const WEEKDAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
@@ -227,7 +228,7 @@ export default function BookAppointment() {
                 >
                   <DoctorAvatar initials={getInitials(doc.name)} size={44} />
                   <div className="min-w-0">
-                    <div className="truncate text-sm font-bold text-ink">{doc.name}</div>
+                    <div className="truncate text-sm font-bold text-ink">{formatDoctorName(doc.name)}</div>
                     <div className="text-[0.8125rem] text-ink-secondary">{doc.specialization || 'General dentistry'}</div>
                   </div>
                 </div>

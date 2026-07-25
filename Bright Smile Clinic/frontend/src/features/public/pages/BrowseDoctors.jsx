@@ -6,6 +6,7 @@ import DoctorAvatar from '../../../components/DoctorAvatar';
 import Input from '../../../components/Input';
 import { useBooking } from '../../booking/hooks/useBooking';
 import { getInitials } from '../../../utils/getInitials';
+import { formatDoctorName } from '../../../utils/formatDoctorName';
 
 export default function BrowseDoctors() {
   const { doctors, isLoadingCatalog, catalogError, fetchDoctors } = useBooking();
@@ -97,14 +98,14 @@ export default function BrowseDoctors() {
                 {doc.photoUrl ? (
                   <img
                     src={doc.photoUrl}
-                    alt={doc.name}
+                    alt={formatDoctorName(doc.name)}
                     className="h-16 w-16 rounded-full object-cover"
                   />
                 ) : (
                   <DoctorAvatar initials={getInitials(doc.name)} size={64} />
                 )}
                 <div>
-                  <div className="text-base font-bold text-ink">{doc.name}</div>
+                  <div className="text-base font-bold text-ink">{formatDoctorName(doc.name)}</div>
                   <div className="mt-0.5 text-[0.8125rem] text-ink-secondary">
                     {doc.specialization || 'General dentistry'}
                   </div>

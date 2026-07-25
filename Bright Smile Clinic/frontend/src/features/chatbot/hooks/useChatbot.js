@@ -16,39 +16,50 @@ export function useChatbot() {
   const sessionIdRef = useRef(undefined);
   const nextIdRef = useRef(0);
 
-  const addMessage = useCallback((from, text) => {
+  const addMessage = useCallback((from, text, card = null) => {
     nextIdRef.current += 1;
-    setMessages((prev) => [...prev, { id: nextIdRef.current, from, text }]);
+    setMessages((prev) => [...prev, { id: nextIdRef.current, from, text, card }]);
   }, []);
 
   const open = useCallback(() => {
     setIsOpen(true);
-    setMessages((prev) => (prev.length > 0 ? prev : [{ id: 0, from: 'bot', text: WELCOME_MESSAGE }]));
+    setMessages((prev) => (prev.length > 0 ? prev : [{ id: 0, from: 'bot', text: WELCOME_MESSAGE, card: null }]));
   }, []);
 
   const close = useCallback(() => setIsOpen(false), []);
 
-  const send = useCallback(async () => {
-    const text = input.trim();
-    if (!text) return;
+  // Shared by the input's send button AND every inline card's tap/confirm/
+  // change action (Phase 9b) — a card selection is just "the next message",
+  // exactly like the patient typing it themselves.
+  const sendText = useCallback(
+    async (text) => {
+      const trimmed = text.trim();
+      if (!trimmed) return;
 
-    addMessage('user', text);
+      addMessage('user', trimmed);
+      setIsTyping(true);
+
+      try {
+        const { reply, sessionId, card } = await chatbotService.sendMessage({
+          message: trimmed,
+          sessionId: sessionIdRef.current,
+        });
+        sessionIdRef.current = sessionId;
+        addMessage('bot', reply, card);
+      } catch (error) {
+        addMessage('bot', FALLBACK_ERROR_MESSAGE);
+      } finally {
+        setIsTyping(false);
+      }
+    },
+    [addMessage]
+  );
+
+  const send = useCallback(() => {
+    const text = input;
     setInput('');
-    setIsTyping(true);
-
-    try {
-      const { reply, sessionId } = await chatbotService.sendMessage({
-        message: text,
-        sessionId: sessionIdRef.current,
-      });
-      sessionIdRef.current = sessionId;
-      addMessage('bot', reply);
-    } catch (error) {
-      addMessage('bot', FALLBACK_ERROR_MESSAGE);
-    } finally {
-      setIsTyping(false);
-    }
-  }, [input, addMessage]);
+    return sendText(text);
+  }, [input, sendText]);
 
   const handleKeyDown = useCallback(
     (e) => {
@@ -57,5 +68,5 @@ export function useChatbot() {
     [send]
   );
 
-  return { isOpen, messages, input, isTyping, open, close, send, setInput, handleKeyDown };
+  return { isOpen, messages, input, isTyping, open, close, send, sendText, setInput, handleKeyDown };
 }

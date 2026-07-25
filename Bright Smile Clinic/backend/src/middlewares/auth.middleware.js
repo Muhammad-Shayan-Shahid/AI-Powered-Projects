@@ -36,4 +36,23 @@ function requireRole(...roles) {
   };
 }
 
-module.exports = { verifyToken, requireRole };
+// Like verifyToken, but never rejects the request — attaches req.user only
+// when a valid session cookie is present, leaves it undefined otherwise.
+// Used by routes that work for both logged-in and anonymous callers (e.g. the
+// public chatbot endpoint, which gates patient-only actions like booking on
+// req.user itself rather than on route-level access).
+async function optionalAuth(req, res, next) {
+  const token = req.cookies?.token;
+  if (!token) return next();
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const user = await User.findById(decoded.id);
+    if (user) req.user = user;
+  } catch (error) {
+    // Invalid/expired token — proceed unauthenticated rather than blocking chat.
+  }
+  next();
+}
+
+module.exports = { verifyToken, requireRole, optionalAuth };

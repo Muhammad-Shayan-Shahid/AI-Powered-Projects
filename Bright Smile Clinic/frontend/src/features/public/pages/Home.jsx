@@ -6,6 +6,7 @@ import DoctorAvatar from '../../../components/DoctorAvatar';
 import { useBooking } from '../../booking/hooks/useBooking';
 import { useRevealOnScroll } from '../hooks/useRevealOnScroll';
 import { getInitials } from '../../../utils/getInitials';
+import { formatDoctorName } from '../../../utils/formatDoctorName';
 
 // Presentational only — the Service model has no icon field, so real service
 // names are mapped onto this cycling theme rather than a hardcoded catalog.
@@ -178,14 +179,14 @@ export default function Home() {
                       {doc.photoUrl ? (
                         <img
                           src={doc.photoUrl}
-                          alt={doc.name}
+                          alt={formatDoctorName(doc.name)}
                           className="h-16 w-16 rounded-full object-cover shadow-[0_2px_6px_oklch(22%_0.05_265_/_0.1)]"
                         />
                       ) : (
                         <DoctorAvatar initials={getInitials(doc.name)} size={64} />
                       )}
                       <div>
-                        <div className="text-base font-bold text-ink">{doc.name}</div>
+                        <div className="text-base font-bold text-ink">{formatDoctorName(doc.name)}</div>
                         <div className="mt-0.5 text-[0.8125rem] text-ink-secondary">
                           {doc.specialization || 'General dentistry'}
                         </div>

@@ -6,6 +6,7 @@ import FormAlert from '../../../components/FormAlert';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useDoctor } from '../hooks/useDoctor';
 import { getInitials } from '../../../utils/getInitials';
+import { formatDoctorName } from '../../../utils/formatDoctorName';
 import { formatTimeLabel } from '../../../utils/dateFormat';
 
 function greeting() {
@@ -69,7 +70,7 @@ export default function DoctorDashboard() {
       <main className="min-w-0 flex-1 p-6 sm:p-8 md:p-10">
         <div className="mb-7">
           <h1 className="m-0 mb-1.5 text-[1.75rem] font-bold leading-[1.3] tracking-tight text-ink">
-            {greeting()}, Dr. {user?.name}.
+            {greeting()}, {formatDoctorName(user?.name)}.
           </h1>
           <p className="m-0 text-[0.9375rem] leading-normal text-ink-secondary">Here's what's happening today.</p>
         </div>

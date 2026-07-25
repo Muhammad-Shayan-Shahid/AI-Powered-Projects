@@ -1,4 +1,5 @@
 const { getIO } = require('./socket.service');
+const { formatDoctorName } = require('../utils/formatDoctorName');
 const {
   sendAppointmentCreatedEmail,
   sendAppointmentConfirmedEmail,
@@ -56,7 +57,7 @@ async function notifyAppointmentConfirmed({ appointment, doctor }) {
   const patient = appointment.patientId;
   const service = appointment.serviceId;
   const dateLabel = formatDateLabel(appointment.date);
-  const message = `Dr. ${doctor.name} confirmed your ${service.name} appointment on ${dateLabel} at ${appointment.timeSlot}.`;
+  const message = `${formatDoctorName(doctor.name)} confirmed your ${service.name} appointment on ${dateLabel} at ${appointment.timeSlot}.`;
 
   emitToUser('appointment:confirmed', patient._id, message, { appointmentId: appointment._id });
 
@@ -77,7 +78,7 @@ async function notifyAppointmentRejected({ appointment, doctor }) {
   const service = appointment.serviceId;
   const dateLabel = formatDateLabel(appointment.date);
   const reasonSuffix = appointment.rejectionReason ? ` Reason: ${appointment.rejectionReason}` : '';
-  const message = `Dr. ${doctor.name} could not accept your ${service.name} appointment on ${dateLabel} at ${appointment.timeSlot}.${reasonSuffix}`;
+  const message = `${formatDoctorName(doctor.name)} could not accept your ${service.name} appointment on ${dateLabel} at ${appointment.timeSlot}.${reasonSuffix}`;
 
   emitToUser('appointment:rejected', patient._id, message, {
     appointmentId: appointment._id,

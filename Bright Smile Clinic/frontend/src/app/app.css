@@ -94,6 +94,9 @@
   /* Chat widget mascot */
   --animate-mascot-float: mascotFloat 2.6s ease-in-out infinite;
   --animate-mascot-dance: mascotDance 1.4s cubic-bezier(0.4, 0, 0.2, 1) 1;
+
+  /* Chat widget messages/cards (Phase 9b) */
+  --animate-message-in: messageIn 320ms cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
 @keyframes fadeInUp {
@@ -151,6 +154,10 @@
 @keyframes mascotFloat {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-3px); }
+}
+@keyframes messageIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 @keyframes mascotDance {
   0% { transform: rotate(0deg) translateY(0); }

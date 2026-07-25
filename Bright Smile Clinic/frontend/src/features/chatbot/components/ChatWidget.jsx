@@ -2,8 +2,39 @@ import { useEffect, useRef } from 'react';
 import { useChatbot } from '../hooks/useChatbot';
 import { useMascot } from '../hooks/useMascot';
 import MascotIcon, { MascotHeaderIcon } from './MascotIcon';
+import DoctorPickerCard from './cards/DoctorPickerCard';
+import SlotPickerCard from './cards/SlotPickerCard';
+import ConfirmationCard from './cards/ConfirmationCard';
+import { formatTimeLabel } from '../../../utils/dateFormat';
 
 const DOT_DELAYS_MS = [0, 150, 300];
+
+// Renders the inline card a bot message carries (Phase 9b), if any. Every
+// card's data comes straight from the backend's tool-call results — tapping
+// an option just sends the next chat message, exactly like typing it.
+function MessageCard({ card, onSendText }) {
+  if (!card) return null;
+  if (card.type === 'doctor_picker') {
+    return <DoctorPickerCard data={card.data} onSelect={(doc) => onSendText(doc.name)} />;
+  }
+  if (card.type === 'slot_picker') {
+    return <SlotPickerCard data={card.data} onSelect={(slot) => onSendText(formatTimeLabel(slot))} />;
+  }
+  if (card.type === 'confirmation') {
+    return (
+      <ConfirmationCard
+        data={card.data}
+        variant="confirm"
+        onConfirm={() => onSendText('Yes, I confirm — please book it.')}
+        onChange={() => onSendText("Actually, can I pick a different time?")}
+      />
+    );
+  }
+  if (card.type === 'success') {
+    return <ConfirmationCard data={card.data} variant="success" />;
+  }
+  return null;
+}
 
 // Floating, always-mounted FAQ chat widget (see CLAUDE.md Chatbot/RAG rules) —
 // imported from the Bright Smile Claude Design project ("Chat Widget.dc.html").
@@ -15,7 +46,7 @@ const DOT_DELAYS_MS = [0, 150, 300];
 // panel itself (messages, input, send) is unchanged from Phase 9a; only the
 // trigger and the header icon are new.
 export default function ChatWidget() {
-  const { isOpen, messages, input, isTyping, open, close, send, setInput, handleKeyDown } = useChatbot();
+  const { isOpen, messages, input, isTyping, open, close, send, sendText, setInput, handleKeyDown } = useChatbot();
   const { pose, isBlinking, prefersReducedMotion, playGreetingThenOpen } = useMascot(isOpen);
   const scrollRef = useRef(null);
 
@@ -45,6 +76,7 @@ export default function ChatWidget() {
       )}
 
       <div
+        data-testid="chatbot-panel"
         className={[
           'fixed bottom-24 right-6 h-[min(70vh,580px)] w-[380px] origin-bottom-right rounded-[22px] transition-all duration-[260ms] ease-[cubic-bezier(0.4,0,0.2,1)]',
           'max-[480px]:top-0 max-[480px]:left-0 max-[480px]:right-0 max-[480px]:bottom-0 max-[480px]:h-full max-[480px]:w-full max-[480px]:rounded-none',
@@ -72,16 +104,22 @@ export default function ChatWidget() {
 
           <div ref={scrollRef} className="flex flex-1 flex-col gap-2.5 overflow-y-auto bg-page p-[18px]">
             {messages.map((msg) => (
-              <div key={msg.id} className={`flex ${msg.from === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div
-                  className={
-                    msg.from === 'user'
-                      ? 'max-w-[80%] rounded-2xl rounded-br-[4px] bg-brand px-[15px] py-[11px] text-[0.875rem] leading-[1.45] text-white text-pretty'
-                      : 'max-w-[80%] rounded-2xl rounded-bl-[4px] bg-neutral-hover px-[15px] py-[11px] text-[0.875rem] leading-[1.45] text-ink text-pretty'
-                  }
-                >
-                  {msg.text}
-                </div>
+              <div
+                key={msg.id}
+                className={`animate-message-in flex flex-col gap-2.5 ${msg.from === 'user' ? 'items-end' : 'items-start'}`}
+              >
+                {msg.text && (
+                  <div
+                    className={
+                      msg.from === 'user'
+                        ? 'max-w-[80%] rounded-2xl rounded-br-[4px] bg-brand px-[15px] py-[11px] text-[0.875rem] leading-[1.45] text-white text-pretty'
+                        : 'max-w-[80%] rounded-2xl rounded-bl-[4px] bg-neutral-hover px-[15px] py-[11px] text-[0.875rem] leading-[1.45] text-ink text-pretty'
+                    }
+                  >
+                    {msg.text}
+                  </div>
+                )}
+                <MessageCard card={msg.card} onSendText={sendText} />
               </div>
             ))}
             {isTyping && (

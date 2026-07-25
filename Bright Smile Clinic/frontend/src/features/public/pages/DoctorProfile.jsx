@@ -5,6 +5,7 @@ import Footer from '../../../components/Footer';
 import DoctorAvatar from '../../../components/DoctorAvatar';
 import { useBooking } from '../../booking/hooks/useBooking';
 import { getInitials } from '../../../utils/getInitials';
+import { formatDoctorName } from '../../../utils/formatDoctorName';
 
 export default function DoctorProfile() {
   const { id } = useParams();
@@ -38,7 +39,7 @@ export default function DoctorProfile() {
               {selectedDoctor.photoUrl ? (
                 <img
                   src={selectedDoctor.photoUrl}
-                  alt={selectedDoctor.name}
+                  alt={formatDoctorName(selectedDoctor.name)}
                   className="h-24 w-24 flex-shrink-0 rounded-full object-cover"
                 />
               ) : (
@@ -46,7 +47,7 @@ export default function DoctorProfile() {
               )}
               <div className="min-w-[200px] flex-1">
                 <h1 className="m-0 mb-1 text-[1.625rem] font-bold leading-[1.3] tracking-tight text-ink">
-                  {selectedDoctor.name}
+                  {formatDoctorName(selectedDoctor.name)}
                 </h1>
                 <div className="text-[0.9375rem] font-semibold text-clinician">
                   {selectedDoctor.specialization || 'General dentistry'}

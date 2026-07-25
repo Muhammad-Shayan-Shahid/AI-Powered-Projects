@@ -7,6 +7,7 @@ import DoctorAvatar from '../../../components/DoctorAvatar';
 import FormAlert from '../../../components/FormAlert';
 import { useBooking } from '../hooks/useBooking';
 import { getInitials } from '../../../utils/getInitials';
+import { formatDoctorName } from '../../../utils/formatDoctorName';
 import { formatAppointmentDateTime, isFutureAppointment } from '../../../utils/dateFormat';
 
 export default function MyAppointments() {
@@ -56,15 +57,15 @@ export default function MyAppointments() {
           <div className="flex flex-col gap-3.5">
             {appointments.map((appt) => {
               const cancelable = ['pending', 'confirmed'].includes(appt.status) && isFutureAppointment(appt.date, appt.timeSlot);
-              const doctorName = appt.doctorId?.name || 'Doctor';
+              const doctorName = appt.doctorId?.name;
               return (
                 <div
                   key={appt._id}
                   className="flex animate-fade-in-up flex-wrap items-center gap-4 rounded-2xl border border-border bg-surface p-5 transition-all duration-200 ease-in-out hover:-translate-y-0.5 hover:shadow-md"
                 >
-                  <DoctorAvatar initials={getInitials(doctorName)} size={48} />
+                  <DoctorAvatar initials={getInitials(doctorName || 'Doctor')} size={48} />
                   <div className="min-w-[180px] flex-1">
-                    <div className="text-[0.9375rem] font-bold text-ink">{doctorName}</div>
+                    <div className="text-[0.9375rem] font-bold text-ink">{doctorName ? formatDoctorName(doctorName) : 'Doctor'}</div>
                     <div className="mt-0.5 text-[0.8125rem] text-ink-secondary">
                       {appt.serviceId?.name} · {formatAppointmentDateTime(appt.date, appt.timeSlot)}
                     </div>
