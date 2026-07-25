@@ -2,6 +2,10 @@ const mongoose = require('mongoose');
 const { PDFParse } = require('pdf-parse');
 const Document = require('../models/document.model');
 const { uploadToImageKit } = require('../services/upload.service');
+const { createChunksForDocument, reembedDocument, deleteChunksForDocument } = require('../services/embedding.service');
+
+const EMBEDDING_FAILED_MESSAGE =
+  'Document saved, but the chatbot knowledge base could not be updated (embedding failed). It will not be searchable by the chatbot until this is retried.';
 
 const EXTRACTION_FAILED_MESSAGE =
   "Could not extract text from this PDF (it may be scanned/image-only). The file was saved, but content is empty — add it manually.";
@@ -73,9 +77,18 @@ async function createDocument(req, res, next) {
 
     const document = await Document.create({ title, category, content: finalContent, fileUrl });
 
+    // Fresh document, nothing to delete first — just chunk + embed what was just saved.
+    let embeddingWarning = null;
+    try {
+      await createChunksForDocument(document);
+    } catch (error) {
+      console.error('Embedding failed for new document:', error);
+      embeddingWarning = EMBEDDING_FAILED_MESSAGE;
+    }
+
     return res.status(201).json({
       success: true,
-      data: { document, extractionWarning },
+      data: { document, extractionWarning, embeddingWarning },
       message: extractionWarning ? 'Document created, but PDF text extraction failed.' : 'Document created.',
     });
   } catch (error) {
@@ -110,9 +123,19 @@ async function updateDocument(req, res, next) {
 
     await document.save();
 
+    // Always delete-then-recreate chunks on update (see embedding.service.js),
+    // even if content didn't change on this request — cheap, and guarantees no drift.
+    let embeddingWarning = null;
+    try {
+      await reembedDocument(document);
+    } catch (error) {
+      console.error('Re-embedding failed for updated document:', error);
+      embeddingWarning = EMBEDDING_FAILED_MESSAGE;
+    }
+
     return res.status(200).json({
       success: true,
-      data: { document, extractionWarning },
+      data: { document, extractionWarning, embeddingWarning },
       message: extractionWarning ? 'Document updated, but PDF text extraction failed.' : 'Document updated.',
     });
   } catch (error) {
@@ -133,6 +156,7 @@ async function deleteDocument(req, res, next) {
     }
 
     await document.deleteOne();
+    await deleteChunksForDocument(document._id);
     return res.status(200).json({ success: true, data: null, message: 'Document removed.' });
   } catch (error) {
     next(error);

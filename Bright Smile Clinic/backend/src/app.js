@@ -10,6 +10,7 @@ const appointmentRoutes = require('./routes/appointment.routes');
 const userRoutes = require('./routes/user.routes');
 const adminRoutes = require('./routes/admin.routes');
 const documentRoutes = require('./routes/document.routes');
+const chatbotRoutes = require('./routes/chatbot.routes');
 
 const app = express();
 
@@ -32,6 +33,7 @@ app.use('/api/appointments', appointmentRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/admin/documents', documentRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/chatbot', chatbotRoutes);
 
 // Catch-all for unmatched routes.
 app.use((req, res) => {

@@ -5,6 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { store } from './app.store';
 import AppRoutes from './app.routes';
 import NotificationListener from './NotificationListener';
+import ChatWidget from '../features/chatbot/components/ChatWidget';
 import { useAuth } from '../features/auth/hooks/useAuth';
 import './app.css';
 
@@ -27,6 +28,7 @@ export default function App() {
       <AuthBootstrap>
         <NotificationListener />
         <AppRoutes />
+        <ChatWidget />
         <ToastContainer position="top-right" autoClose={5000} />
       </AuthBootstrap>
     </Provider>
