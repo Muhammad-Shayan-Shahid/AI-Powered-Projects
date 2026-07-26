@@ -50,22 +50,30 @@ app.use('/api/reviews', reviewRoutes);
 app.use('/api/payments', paymentRoutes);
 
 // Single combined deployment: this Express server also serves the built React
-// app so only one Render service is needed. This MUST come after every /api
-// route above — express.static/the SPA catch-all below only run once none of
-// the API routes matched, so they can never shadow a real API response.
-const frontendBuildPath = path.join(__dirname, '..', 'public');
-app.use(express.static(frontendBuildPath));
+// app (manually built + copied into backend/public — see CLAUDE.md's "Manual
+// deploy" convention) so only one Render service is needed. This MUST come
+// after every /api route above — express.static/the SPA catch-all below only
+// run once none of the API routes matched, so they can never shadow a real
+// API response.
+//
+// trust proxy is required behind Render's reverse proxy so req.secure/req.ip
+// and the httpOnly auth cookie's `secure` flag behave correctly.
+app.set('trust proxy', 1);
+app.use(express.static(path.resolve(__dirname, '../public')));
 
 // Anything else that isn't an /api/* call is a client-side route (React
 // Router) — serve index.html and let the browser router take over, so a hard
 // refresh/direct URL visit on e.g. /booking/my-appointments works instead of
-// 404ing. Excludes /api so unmatched API routes still fall through to the
-// JSON 404 handler below instead of getting index.html back.
-app.get(/^\/(?!api(?:\/|$)).*/, (req, res) => {
-  res.sendFile(path.join(frontendBuildPath, 'index.html'));
+// 404ing. Express 5's path-to-regexp requires the named-wildcard `{*splat}`
+// form instead of a bare `*`.
+app.get('{*splat}', (req, res) => {
+  res.sendFile(path.resolve(__dirname, '../public/index.html'));
 });
 
-// Catch-all for unmatched routes (only reachable for unmatched /api/* calls now).
+// Catch-all for unmatched routes. The SPA catch-all above only registers for
+// GET, so this is reached by non-GET requests to unmatched routes (including
+// /api/*) — a GET to an unmatched /api/* path now gets index.html, not this
+// JSON 404, since the SPA catch-all has no /api exclusion.
 app.use((req, res) => {
   res.status(404).json({ success: false, data: null, message: 'Route not found.' });
 });
