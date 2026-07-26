@@ -9,6 +9,12 @@ module.exports = {
   JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN,
   NODE_ENV: process.env.NODE_ENV || 'development',
   CLIENT_URL: process.env.CLIENT_URL || 'http://localhost:5173',
+  // Single-clinic app operating in Pakistan Standard Time (no DST). All
+  // appointment `date`/`timeSlot` values are clinic-local wall-clock values,
+  // not the server's own system timezone (most hosts/dev machines run UTC) —
+  // any "is this slot in the past" check must convert through this zone
+  // rather than comparing raw server time. See booking.service.js.
+  CLINIC_TIMEZONE: process.env.CLINIC_TIMEZONE || 'Asia/Karachi',
   RESEND_API_KEY: process.env.RESEND_API_KEY,
   // Resend's shared sandbox sender — swap for a verified clinic domain before production.
   EMAIL_FROM: process.env.EMAIL_FROM || 'Bright Smile Clinic <onboarding@resend.dev>',

@@ -10,7 +10,9 @@ const LOGIN_PATH_BY_ROLE = {
 
 // Maps a role to that role's own dashboard, for bouncing an already-logged-in
 // user out of a route meant for a different role (they don't need a login page).
-const DASHBOARD_PATH_BY_ROLE = {
+// Also reused by HomeRoute to send an already-logged-in visitor straight to
+// their dashboard instead of showing the marketing Home page.
+export const DASHBOARD_PATH_BY_ROLE = {
   patient: '/patient/dashboard',
   doctor: '/doctor/dashboard',
   admin: '/admin/dashboard',

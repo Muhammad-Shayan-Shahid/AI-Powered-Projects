@@ -109,13 +109,25 @@ export default function BookAppointment() {
   const doneFlags = [doctorPicked, servicePicked, datePicked, slotPicked];
   const currentStepIdx = !doctorPicked ? 0 : !servicePicked ? 1 : !datePicked ? 2 : !slotPicked ? 3 : 3;
 
+  // Doctor <-> service filtering mirrors the server-side check in
+  // booking.service.js's computeAvailableSlots/bookAppointment (never trust
+  // the frontend alone) — this just keeps the picker from ever offering a
+  // combination the backend would reject anyway.
   const filteredDoctors = useMemo(() => {
     const q = doctorSearch.trim().toLowerCase();
-    if (!q) return doctors;
-    return doctors.filter(
-      (d) => d.name.toLowerCase().includes(q) || (d.specialization || '').toLowerCase().includes(q)
-    );
-  }, [doctors, doctorSearch]);
+    return doctors.filter((d) => {
+      const matchesSearch = !q || d.name.toLowerCase().includes(q) || (d.specialization || '').toLowerCase().includes(q);
+      const offersSelectedService = !serviceId || (d.services || []).some((s) => s._id === serviceId);
+      return matchesSearch && offersSelectedService;
+    });
+  }, [doctors, doctorSearch, serviceId]);
+
+  const selectedDoctor = useMemo(() => doctors.find((d) => d._id === doctorId) || null, [doctors, doctorId]);
+  const availableServices = useMemo(() => {
+    if (!selectedDoctor) return services;
+    const offeredIds = new Set((selectedDoctor.services || []).map((s) => s._id));
+    return services.filter((svc) => offeredIds.has(svc._id));
+  }, [services, selectedDoctor]);
 
   const monthLabel = new Date(calendarYear, calendarMonth, 1).toLocaleDateString('en-US', {
     month: 'long',
@@ -258,7 +270,7 @@ export default function BookAppointment() {
           <section className={`rounded-2xl border border-border bg-surface p-6 transition-opacity duration-200 ${doctorPicked ? 'opacity-100' : 'pointer-events-none opacity-45'}`}>
             <div className="mb-3.5 text-base font-bold text-ink">2. Select a service</div>
             <div className="flex flex-wrap gap-2.5">
-              {services.map((svc) => (
+              {availableServices.map((svc) => (
                 <button
                   key={svc._id}
                   type="button"
@@ -271,6 +283,9 @@ export default function BookAppointment() {
                 </button>
               ))}
             </div>
+            {doctorPicked && !isLoadingCatalog && availableServices.length === 0 && (
+              <p className="m-0 mt-1 text-sm text-ink-secondary">This doctor doesn't have any bookable services listed yet.</p>
+            )}
           </section>
 
           <section className={`rounded-2xl border border-border bg-surface p-6 transition-opacity duration-200 ${servicePicked ? 'opacity-100' : 'pointer-events-none opacity-45'}`}>

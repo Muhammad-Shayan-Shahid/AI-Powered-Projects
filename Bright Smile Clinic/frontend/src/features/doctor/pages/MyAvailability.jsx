@@ -33,10 +33,18 @@ export default function MyAvailability() {
   const [days, setDays] = useState(buildInitialDays);
   const [saveState, setSaveState] = useState('idle'); // idle | saving | saved
   const [saveError, setSaveError] = useState(null);
+  const [hasFetchedOnce, setHasFetchedOnce] = useState(false);
   const didHydrateRef = useRef(false);
 
+  // Marks hasFetchedOnce only once the dispatched thunk actually settles, not
+  // just once it's dispatched. isLoadingAvailability can't be used for this:
+  // it's still `false` (the slice's initialState) in the same commit this
+  // effect runs in, since the pending action reducer only lands in the store
+  // after this render — a hydrate effect gated on it would fire immediately,
+  // read the still-empty `availability` array, and (see below) never get a
+  // second chance to hydrate once the real data arrives.
   useEffect(() => {
-    fetchAvailability();
+    fetchAvailability().finally(() => setHasFetchedOnce(true));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -44,7 +52,7 @@ export default function MyAvailability() {
   // whatever Availability rows already exist for this doctor. Runs once so
   // it never clobbers in-progress local edits on a later refetch.
   useEffect(() => {
-    if (isLoadingAvailability || didHydrateRef.current) return;
+    if (!hasFetchedOnce || didHydrateRef.current) return;
     didHydrateRef.current = true;
     setDays((prev) =>
       prev.map((day) => {
@@ -52,7 +60,7 @@ export default function MyAvailability() {
         return match ? { ...day, enabled: true, start: match.startTime, end: match.endTime, id: match._id } : day;
       })
     );
-  }, [isLoadingAvailability, availability]);
+  }, [hasFetchedOnce, availability]);
 
   function toggleDay(i) {
     setDays((prev) => prev.map((d, idx) => (idx === i ? { ...d, enabled: !d.enabled } : d)));

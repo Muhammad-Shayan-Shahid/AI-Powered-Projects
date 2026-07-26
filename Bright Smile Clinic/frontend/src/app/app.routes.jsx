@@ -1,5 +1,5 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import Home from '../features/public/pages/Home';
+import HomeRoute from './HomeRoute';
 import BrowseDoctors from '../features/public/pages/BrowseDoctors';
 import DoctorProfile from '../features/public/pages/DoctorProfile';
 import BrowseServices from '../features/public/pages/BrowseServices';
@@ -29,7 +29,7 @@ import PaymentCancelled from '../features/booking/pages/PaymentCancelled';
 import ProtectedRoute from './ProtectedRoute';
 
 const router = createBrowserRouter([
-  { path: '/', element: <Home /> },
+  { path: '/', element: <HomeRoute /> },
   { path: '/doctors', element: <BrowseDoctors /> },
   { path: '/doctors/:id', element: <DoctorProfile /> },
   { path: '/services', element: <BrowseServices /> },

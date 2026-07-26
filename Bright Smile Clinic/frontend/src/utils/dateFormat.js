@@ -1,3 +1,15 @@
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+// Single-clinic app operating in Pakistan Standard Time (no DST) — mirrors
+// CLINIC_TIMEZONE in backend/src/config/config.js. appointment.date/timeSlot
+// are clinic-local wall-clock values, not the visiting browser's own
+// timezone, so any "is this in the future" check must go through this zone.
+const CLINIC_TIMEZONE = 'Asia/Karachi';
+
 function pad2(n) {
   return String(n).padStart(2, '0');
 }
@@ -52,9 +64,9 @@ export function formatAppointmentDateTime(dateISOString, timeSlot) {
 
 export function isFutureAppointment(dateISOString, timeSlot) {
   const d = new Date(dateISOString);
-  const [hours, minutes] = timeSlot.split(':').map(Number);
-  const appointmentMs = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), hours, minutes);
-  return appointmentMs > Date.now();
+  const dateKey = formatDateKey(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+  const appointmentMoment = dayjs.tz(`${dateKey}T${timeSlot}:00`, CLINIC_TIMEZONE);
+  return appointmentMoment.valueOf() > Date.now();
 }
 
 // timestamp -> "2h ago" / "3d ago", for the patient dashboard's recent-activity feed.

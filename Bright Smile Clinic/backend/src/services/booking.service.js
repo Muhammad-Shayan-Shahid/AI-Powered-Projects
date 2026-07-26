@@ -1,7 +1,13 @@
+const dayjs = require('dayjs');
+const utc = require('dayjs/plugin/utc');
+const timezone = require('dayjs/plugin/timezone');
+dayjs.extend(utc);
+dayjs.extend(timezone);
 const Appointment = require('../models/appointment.model');
 const Availability = require('../models/availability.model');
 const Service = require('../models/service.model');
 const User = require('../models/user.model');
+const { CLINIC_TIMEZONE } = require('../config/config');
 
 // Extracted from appointment.controller.js so the exact same slot-generation
 // and slot-conflict logic can be called in-process by the chatbot's booking
@@ -52,6 +58,34 @@ function rangesOverlap(startA, endA, startB, endB) {
   return startA < endB && startB < endA;
 }
 
+// Slots starting within this many minutes of "now" aren't realistically
+// bookable — a patient can't reliably show up for a slot a few minutes away.
+const MIN_BOOKING_LEAD_MINUTES = 15;
+
+// `date` ("YYYY-MM-DD") and timeSlot ("HH:MM") are always clinic-local
+// wall-clock values (the clinic operates in Pakistan Standard Time), NOT the
+// server's own system timezone — most hosts/dev machines run UTC, so
+// comparing a raw `new Date()` against these would silently be off by a
+// fixed 5-hour offset (worse, one that isn't even always fixed, if the
+// server or clinic zone ever has DST). dayjs' timezone plugin resolves "now"
+// through the real IANA zone database instead of manual hour math, so this
+// stays correct regardless of where the server happens to be hosted.
+function isSlotInPast(dateString, timeSlot) {
+  const nowInClinicTz = dayjs().tz(CLINIC_TIMEZONE);
+  if (dateString !== nowInClinicTz.format('YYYY-MM-DD')) return false;
+  const nowMinutesInClinicTz = nowInClinicTz.hour() * 60 + nowInClinicTz.minute();
+  return timeToMinutes(timeSlot) < nowMinutesInClinicTz + MIN_BOOKING_LEAD_MINUTES;
+}
+
+// The frontend only offers a doctor's own services in the booking wizard, but
+// that's UI-only — never trust it alone (same principle as slot-conflict
+// checking). Re-verified server-side here so neither the real booking flow
+// nor the chatbot's booking tools (both call into this file) can create an
+// appointment for a service the doctor doesn't actually offer.
+function doctorOffersService(doctor, serviceId) {
+  return doctor.services.some((id) => String(id) === String(serviceId));
+}
+
 // Existing appointments can carry a different service (and therefore a
 // different duration) than the one currently being checked, so slots can't be
 // excluded by exact timeSlot string match alone — an overlapping range check
@@ -79,6 +113,9 @@ async function computeAvailableSlots({ doctorId, serviceId, date }) {
   ]);
   if (!service) return { error: { status: 404, message: 'Service not found.' } };
   if (!doctor) return { error: { status: 404, message: 'Doctor not found.' } };
+  if (!doctorOffersService(doctor, serviceId)) {
+    return { error: { status: 400, message: 'This doctor does not offer the selected service.' } };
+  }
 
   const dayStart = parseDateOnly(date);
   if (!dayStart) return { error: { status: 400, message: 'Invalid date.' } };
@@ -94,6 +131,7 @@ async function computeAvailableSlots({ doctorId, serviceId, date }) {
 
   const bookedRanges = await getBookedRanges(doctorId, dayStart);
   const slots = [...candidateSlots]
+    .filter((slot) => !isSlotInPast(date, slot))
     .filter((slot) => {
       const slotStart = timeToMinutes(slot);
       const slotEnd = slotStart + service.durationMinutes;
@@ -116,6 +154,9 @@ async function bookAppointment({ patientId, doctorId, serviceId, date, timeSlot 
   ]);
   if (!service) return { error: { status: 404, message: 'Service not found.' } };
   if (!doctor) return { error: { status: 404, message: 'Doctor not found.' } };
+  if (!doctorOffersService(doctor, serviceId)) {
+    return { error: { status: 400, message: 'This doctor does not offer the selected service.' } };
+  }
 
   const dayStart = parseDateOnly(date);
   if (!dayStart) return { error: { status: 400, message: 'Invalid date.' } };
@@ -130,6 +171,9 @@ async function bookAppointment({ patientId, doctorId, serviceId, date, timeSlot 
   }
   if (!validSlots.has(timeSlot)) {
     return { error: { status: 400, message: "This slot is not within the doctor's availability." } };
+  }
+  if (isSlotInPast(date, timeSlot)) {
+    return { error: { status: 400, message: 'This time slot has already passed. Please choose a later time.' } };
   }
 
   const slotStart = timeToMinutes(timeSlot);
