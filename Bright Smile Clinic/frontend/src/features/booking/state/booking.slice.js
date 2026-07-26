@@ -61,10 +61,30 @@ export const fetchMyAppointments = createAsyncThunk('booking/fetchMyAppointments
   }
 });
 
+export const createReview = createAsyncThunk('booking/createReview', async (payload, thunkAPI) => {
+  try {
+    const data = await bookingService.createReview(payload);
+    return { appointmentId: payload.appointmentId, review: data.review };
+  } catch (error) {
+    return rejectWithBookingError(error, thunkAPI);
+  }
+});
+
 export const cancelAppointment = createAsyncThunk('booking/cancelAppointment', async (id, thunkAPI) => {
   try {
     const data = await bookingService.cancelAppointment(id);
     return { id, appointment: data.appointment };
+  } catch (error) {
+    return rejectWithBookingError(error, thunkAPI);
+  }
+});
+
+// Resolves to the Stripe-hosted checkout URL — the component does the actual
+// window.location redirect, since that's a side effect, not state.
+export const createCheckoutSession = createAsyncThunk('booking/createCheckoutSession', async (appointmentId, thunkAPI) => {
+  try {
+    const data = await bookingService.createCheckoutSession(appointmentId);
+    return { checkoutUrl: data.checkoutUrl };
   } catch (error) {
     return rejectWithBookingError(error, thunkAPI);
   }
@@ -77,6 +97,9 @@ const initialState = {
   catalogError: null,
 
   selectedDoctor: null,
+  doctorAverageRating: 0,
+  doctorReviewCount: 0,
+  doctorReviews: [],
   isLoadingDoctor: false,
   doctorError: null,
 
@@ -94,6 +117,12 @@ const initialState = {
 
   cancelingId: null,
   cancelError: null,
+
+  reviewingId: null, // appointment id currently being reviewed
+  reviewError: null,
+
+  payingId: null, // appointment id currently starting a checkout session
+  payError: null,
 };
 
 const bookingSlice = createSlice({
@@ -110,6 +139,9 @@ const bookingSlice = createSlice({
     },
     clearSelectedDoctor(state) {
       state.selectedDoctor = null;
+      state.doctorAverageRating = 0;
+      state.doctorReviewCount = 0;
+      state.doctorReviews = [];
       state.doctorError = null;
     },
   },
@@ -148,10 +180,16 @@ const bookingSlice = createSlice({
       .addCase(fetchDoctorById.fulfilled, (state, action) => {
         state.isLoadingDoctor = false;
         state.selectedDoctor = action.payload.doctor;
+        state.doctorAverageRating = action.payload.averageRating || 0;
+        state.doctorReviewCount = action.payload.reviewCount || 0;
+        state.doctorReviews = action.payload.reviews || [];
       })
       .addCase(fetchDoctorById.rejected, (state, action) => {
         state.isLoadingDoctor = false;
         state.selectedDoctor = null;
+        state.doctorAverageRating = 0;
+        state.doctorReviewCount = 0;
+        state.doctorReviews = [];
         state.doctorError = action.payload?.message || 'Could not load this doctor.';
       })
 
@@ -196,6 +234,20 @@ const bookingSlice = createSlice({
         state.appointmentsError = action.payload?.message || 'Could not load your appointments.';
       })
 
+      .addCase(createReview.pending, (state, action) => {
+        state.reviewingId = action.meta.arg.appointmentId;
+        state.reviewError = null;
+      })
+      .addCase(createReview.fulfilled, (state, action) => {
+        state.reviewingId = null;
+        const idx = state.appointments.findIndex((a) => a._id === action.payload.appointmentId);
+        if (idx !== -1) state.appointments[idx].hasReview = true;
+      })
+      .addCase(createReview.rejected, (state, action) => {
+        state.reviewingId = null;
+        state.reviewError = action.payload?.message || 'Could not submit your review.';
+      })
+
       .addCase(cancelAppointment.pending, (state, action) => {
         state.cancelingId = action.meta.arg;
         state.cancelError = null;
@@ -208,6 +260,18 @@ const bookingSlice = createSlice({
       .addCase(cancelAppointment.rejected, (state, action) => {
         state.cancelingId = null;
         state.cancelError = action.payload?.message || 'Could not cancel this appointment.';
+      })
+
+      .addCase(createCheckoutSession.pending, (state, action) => {
+        state.payingId = action.meta.arg;
+        state.payError = null;
+      })
+      .addCase(createCheckoutSession.fulfilled, (state) => {
+        state.payingId = null;
+      })
+      .addCase(createCheckoutSession.rejected, (state, action) => {
+        state.payingId = null;
+        state.payError = action.payload?.message || 'Could not start checkout. Please try again.';
       });
   },
 });

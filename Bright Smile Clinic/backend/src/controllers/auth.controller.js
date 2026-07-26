@@ -21,8 +21,8 @@ function setAuthCookie(res, token) {
 
 // Never leak the hashed password or __v out of the API.
 function sanitizeUser(user) {
-  const { _id, name, email, phone, role, status, specialization, bio, photoUrl, featured, createdAt } = user;
-  return { id: _id, name, email, phone, role, status, specialization, bio, photoUrl, featured, createdAt };
+  const { _id, name, email, phone, role, status, specialization, bio, photoUrl, featured, services, createdAt } = user;
+  return { id: _id, name, email, phone, role, status, specialization, bio, photoUrl, featured, services, createdAt };
 }
 
 async function registerPatient(req, res, next) {

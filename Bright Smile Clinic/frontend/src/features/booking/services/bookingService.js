@@ -32,4 +32,7 @@ export const bookingService = {
   createAppointment: (payload) => request('/appointments', { method: 'POST', body: payload }),
   listMyAppointments: () => request('/appointments/mine'),
   cancelAppointment: (id) => request(`/appointments/${id}/cancel`, { method: 'PATCH' }),
+  createReview: (payload) => request('/reviews', { method: 'POST', body: payload }),
+  createCheckoutSession: (appointmentId) =>
+    request('/payments/create-checkout-session', { method: 'POST', body: { appointmentId } }),
 };

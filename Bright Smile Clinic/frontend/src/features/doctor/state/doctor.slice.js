@@ -42,6 +42,23 @@ export const rejectAppointment = createAsyncThunk('doctor/rejectAppointment', as
   }
 });
 
+export const completeAppointment = createAsyncThunk('doctor/completeAppointment', async (id, thunkAPI) => {
+  try {
+    const data = await doctorService.completeAppointment(id);
+    return { id, appointment: data.appointment };
+  } catch (error) {
+    return thunkAPI.rejectWithValue({ id, message: error.message });
+  }
+});
+
+export const updateDoctorServices = createAsyncThunk('doctor/updateServices', async (services, thunkAPI) => {
+  try {
+    return await doctorService.updateServices(services);
+  } catch (error) {
+    return rejectWithDoctorError(error, thunkAPI);
+  }
+});
+
 export const fetchAvailability = createAsyncThunk('doctor/fetchAvailability', async (_, thunkAPI) => {
   try {
     return await doctorService.listAvailability();
@@ -88,10 +105,16 @@ const initialState = {
   actioningIds: [], // appointment ids currently being confirmed/rejected
   actionError: null,
 
+  completingIds: [], // appointment ids currently being marked completed
+  completeError: null,
+
   availability: [],
   isLoadingAvailability: false,
   availabilityError: null,
   savingAvailabilityIds: [],
+
+  isSavingServices: false,
+  servicesError: null,
 
   isSavingProfile: false,
   profileError: null,
@@ -192,6 +215,32 @@ const doctorSlice = createSlice({
       .addCase(rejectAppointment.rejected, (state, action) => {
         state.actioningIds = state.actioningIds.filter((id) => id !== action.payload?.id);
         state.actionError = action.payload?.message || 'Could not reject this appointment.';
+      })
+
+      .addCase(completeAppointment.pending, (state, action) => {
+        state.completingIds.push(action.meta.arg);
+        state.completeError = null;
+      })
+      .addCase(completeAppointment.fulfilled, (state, action) => {
+        state.completingIds = state.completingIds.filter((id) => id !== action.payload.id);
+        const idx = state.appointments.findIndex((a) => a._id === action.payload.id);
+        if (idx !== -1) state.appointments[idx] = action.payload.appointment;
+      })
+      .addCase(completeAppointment.rejected, (state, action) => {
+        state.completingIds = state.completingIds.filter((id) => id !== action.payload?.id);
+        state.completeError = action.payload?.message || 'Could not mark this appointment completed.';
+      })
+
+      .addCase(updateDoctorServices.pending, (state) => {
+        state.isSavingServices = true;
+        state.servicesError = null;
+      })
+      .addCase(updateDoctorServices.fulfilled, (state) => {
+        state.isSavingServices = false;
+      })
+      .addCase(updateDoctorServices.rejected, (state, action) => {
+        state.isSavingServices = false;
+        state.servicesError = action.payload?.message || 'Could not update services.';
       })
 
       .addCase(fetchAvailability.pending, (state) => {

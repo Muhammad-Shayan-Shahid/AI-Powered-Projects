@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import PatientNavbar from '../../../components/PatientNavbar';
 import Footer from '../../../components/Footer';
 import Input from '../../../components/Input';
@@ -40,6 +40,12 @@ function buildCalendarCells({ year, monthIndex, selectedKey, today, onSelect }) 
 
 export default function BookAppointment() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+  // Doctor Profile's "Book appointment" button passes doctorId via route
+  // state; a shared/bookmarked link can pass it as ?doctorId= instead —
+  // either way, pre-selecting skips the patient straight to step 2.
+  const preselectedDoctorId = location.state?.doctorId || searchParams.get('doctorId') || null;
   const {
     doctors,
     services,
@@ -58,7 +64,7 @@ export default function BookAppointment() {
   } = useBooking();
 
   const [doctorSearch, setDoctorSearch] = useState('');
-  const [doctorId, setDoctorId] = useState(null);
+  const [doctorId, setDoctorId] = useState(preselectedDoctorId);
   const [serviceId, setServiceId] = useState(null);
   const [dateKey, setDateKey] = useState(null);
   const [slot, setSlot] = useState(null);
@@ -76,6 +82,16 @@ export default function BookAppointment() {
     fetchServices();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // A doctorId passed in (e.g. from a stale link) that doesn't match a real,
+  // active doctor once the catalog loads shouldn't silently leave "step 1"
+  // looking done with nothing actually selected.
+  useEffect(() => {
+    if (!isLoadingCatalog && doctorId && doctors.length > 0 && !doctors.some((d) => d._id === doctorId)) {
+      setDoctorId(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoadingCatalog, doctors]);
 
   useEffect(() => {
     if (doctorId && serviceId && dateKey) {

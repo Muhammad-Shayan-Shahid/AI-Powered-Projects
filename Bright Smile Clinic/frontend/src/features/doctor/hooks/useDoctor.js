@@ -5,6 +5,8 @@ import {
   fetchDoctorAppointments,
   confirmAppointment,
   rejectAppointment,
+  completeAppointment,
+  updateDoctorServices,
   fetchAvailability,
   createAvailability,
   updateAvailability,
@@ -36,6 +38,12 @@ export function useDoctor() {
     actioningIds: doctor.actioningIds,
     actionError: doctor.actionError,
 
+    completingIds: doctor.completingIds,
+    completeError: doctor.completeError,
+
+    isSavingServices: doctor.isSavingServices,
+    servicesError: doctor.servicesError,
+
     availability: doctor.availability,
     isLoadingAvailability: doctor.isLoadingAvailability,
     availabilityError: doctor.availabilityError,
@@ -49,6 +57,8 @@ export function useDoctor() {
     fetchDoctorAppointments: useCallback(() => dispatch(fetchDoctorAppointments()), [dispatch]),
     confirmAppointment: useCallback((id) => dispatch(confirmAppointment(id)), [dispatch]),
     rejectAppointment: useCallback((id, reason) => dispatch(rejectAppointment({ id, reason })), [dispatch]),
+    completeAppointment: useCallback((id) => dispatch(completeAppointment(id)), [dispatch]),
+    updateDoctorServices: useCallback((services) => dispatch(updateDoctorServices(services)), [dispatch]),
 
     fetchAvailability: useCallback(() => dispatch(fetchAvailability()), [dispatch]),
     createAvailability: useCallback((payload) => dispatch(createAvailability(payload)), [dispatch]),

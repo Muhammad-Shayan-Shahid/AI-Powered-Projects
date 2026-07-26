@@ -3,6 +3,7 @@ import DoctorSidebar from '../../../components/DoctorSidebar';
 import FormAlert from '../../../components/FormAlert';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useDoctor } from '../hooks/useDoctor';
+import { useBooking } from '../../booking/hooks/useBooking';
 import { getInitials } from '../../../utils/getInitials';
 
 const SPECIALIZATION_OPTIONS = [
@@ -16,7 +17,20 @@ const SPECIALIZATION_OPTIONS = [
 
 export default function ProfileEdit() {
   const { user, getMe } = useAuth();
-  const { isSavingProfile, profileError, profileUploadProgress, uploadProfile } = useDoctor();
+  const { isSavingProfile, profileError, profileUploadProgress, uploadProfile, isSavingServices, servicesError, updateDoctorServices } =
+    useDoctor();
+  const { services, fetchServices } = useBooking();
+
+  const [selectedServiceIds, setSelectedServiceIds] = useState(() => (user?.services || []).map(String));
+
+  useEffect(() => {
+    fetchServices();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function toggleService(id) {
+    setSelectedServiceIds((prev) => (prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]));
+  }
 
   const [specialization, setSpecialization] = useState(
     SPECIALIZATION_OPTIONS.includes(user?.specialization) ? user.specialization : SPECIALIZATION_OPTIONS[0]
@@ -62,9 +76,11 @@ export default function ProfileEdit() {
     setPhotoRemoved(true);
   }
 
+  const isSaving = isSavingProfile || isSavingServices;
+
   async function handleSubmit(e) {
     e.preventDefault();
-    if (isSavingProfile) return;
+    if (isSaving) return;
     setSaved(false);
 
     const formData = new FormData();
@@ -74,17 +90,17 @@ export default function ProfileEdit() {
     else if (photoRemoved) formData.append('removePhoto', 'true');
 
     try {
-      await uploadProfile(formData);
-      await getMe(); // refresh the session user so the sidebar reflects the new specialization/photo
+      await Promise.all([uploadProfile(formData), updateDoctorServices(selectedServiceIds).unwrap()]);
+      await getMe(); // refresh the session user so the sidebar reflects the new specialization/photo/services
       setPhotoRemoved(false);
       setSaved(true);
       setTimeout(() => setSaved(false), 1800);
     } catch {
-      // profileError (from the slice) already surfaces the message via FormAlert below.
+      // profileError/servicesError (from the slices) already surface via FormAlert below.
     }
   }
 
-  const saveLabel = isSavingProfile
+  const saveLabel = isSaving
     ? photoFile
       ? `Uploading… ${profileUploadProgress}%`
       : 'Saving…'
@@ -107,6 +123,7 @@ export default function ProfileEdit() {
           className="flex max-w-[560px] animate-fade-in-up flex-col gap-5 rounded-2xl border border-border bg-surface p-7"
         >
           {profileError && <FormAlert>{profileError}</FormAlert>}
+          {servicesError && <FormAlert>{servicesError}</FormAlert>}
 
           <label className="flex flex-col gap-2">
             <span className="text-[0.8125rem] font-semibold text-ink-secondary">Profile photo</span>
@@ -211,9 +228,30 @@ export default function ProfileEdit() {
             />
           </label>
 
+          <label className="flex flex-col gap-2">
+            <span className="text-[0.8125rem] font-semibold text-ink-secondary">Services you offer</span>
+            <div className="flex flex-wrap gap-2">
+              {services.map((svc) => {
+                const selected = selectedServiceIds.includes(svc._id);
+                return (
+                  <button
+                    key={svc._id}
+                    type="button"
+                    onClick={() => toggleService(svc._id)}
+                    className={`rounded-full border-[1.5px] px-4 py-2 text-[0.8125rem] font-semibold transition-all duration-150 ease-in-out ${
+                      selected ? 'border-clinician bg-clinician text-white' : 'border-disabled-bg bg-transparent text-[oklch(45%_0.01_260)]'
+                    }`}
+                  >
+                    {svc.name}
+                  </button>
+                );
+              })}
+            </div>
+          </label>
+
           <button
             type="submit"
-            disabled={isSavingProfile}
+            disabled={isSaving}
             className="flex items-center gap-2 self-start rounded-full bg-clinician px-7 py-3.5 text-[0.9375rem] font-bold text-white transition-all duration-150 ease-in-out hover:bg-clinician-hover active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-75"
           >
             {saveLabel}

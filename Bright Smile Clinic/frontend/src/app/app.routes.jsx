@@ -24,6 +24,8 @@ import AllAppointments from '../features/admin/pages/AllAppointments';
 import BookAppointment from '../features/booking/pages/BookAppointment';
 import MyAppointments from '../features/booking/pages/MyAppointments';
 import BookingConfirmation from '../features/booking/pages/BookingConfirmation';
+import PaymentSuccess from '../features/booking/pages/PaymentSuccess';
+import PaymentCancelled from '../features/booking/pages/PaymentCancelled';
 import ProtectedRoute from './ProtectedRoute';
 
 const router = createBrowserRouter([
@@ -154,6 +156,22 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute roles={['patient']}>
         <BookingConfirmation />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/booking/payment-success',
+    element: (
+      <ProtectedRoute roles={['patient']}>
+        <PaymentSuccess />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/booking/payment-cancelled',
+    element: (
+      <ProtectedRoute roles={['patient']}>
+        <PaymentCancelled />
       </ProtectedRoute>
     ),
   },

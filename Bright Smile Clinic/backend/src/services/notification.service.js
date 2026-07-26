@@ -98,6 +98,20 @@ async function notifyAppointmentRejected({ appointment, doctor }) {
   );
 }
 
+// Socket-only, no email — a "marked completed" status change isn't
+// urgent/actionable enough to warrant an inbox message, but it still gets a
+// toast for consistency with the other appointment lifecycle events, and the
+// event name follows the same <resource>:<action> convention so future code
+// (e.g. an activity feed) doesn't have to special-case it.
+async function notifyAppointmentCompleted({ appointment, doctor }) {
+  const patient = appointment.patientId;
+  const service = appointment.serviceId;
+  const dateLabel = formatDateLabel(appointment.date);
+  const message = `${formatDoctorName(doctor.name)} marked your ${service.name} appointment on ${dateLabel} as completed.`;
+
+  emitToUser('appointment:completed', patient._id, message, { appointmentId: appointment._id });
+}
+
 // Callers fire these without awaiting (see admin.controller.js) so a slow or
 // failing socket/email never delays or breaks the approve/reject response.
 async function notifyDoctorApproved({ doctor }) {
@@ -123,6 +137,7 @@ module.exports = {
   notifyAppointmentCreated,
   notifyAppointmentConfirmed,
   notifyAppointmentRejected,
+  notifyAppointmentCompleted,
   notifyDoctorApproved,
   notifyDoctorRejected,
 };

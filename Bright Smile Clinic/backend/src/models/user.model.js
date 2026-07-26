@@ -53,6 +53,13 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    // Doctor-only: services this doctor offers. Real relational link that
+    // GET /api/doctors?service= filters against, replacing the old loose
+    // specialization-text matching.
+    services: {
+      type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Service' }],
+      default: [],
+    },
   },
   { timestamps: true }
 );

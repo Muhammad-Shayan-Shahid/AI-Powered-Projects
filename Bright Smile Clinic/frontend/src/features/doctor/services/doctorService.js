@@ -30,6 +30,9 @@ export const doctorService = {
   listAppointments: () => request('/appointments/doctor'),
   confirmAppointment: (id) => request(`/appointments/${id}/confirm`, { method: 'PATCH' }),
   rejectAppointment: (id, reason) => request(`/appointments/${id}/reject`, { method: 'PATCH', body: { reason } }),
+  completeAppointment: (id) => request(`/appointments/${id}/complete`, { method: 'PATCH' }),
+
+  updateServices: (services) => request('/users/doctor-services', { method: 'PATCH', body: { services } }),
 
   listAvailability: () => request('/availability'),
   createAvailability: (payload) => request('/availability', { method: 'POST', body: payload }),

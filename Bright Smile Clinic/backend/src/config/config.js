@@ -36,4 +36,10 @@ module.exports = {
   // needs to change again, check the real numbers for this project at the
   // dashboard link above before picking a replacement.
   GEMINI_CHAT_MODEL: process.env.GEMINI_CHAT_MODEL || 'gemini-3.1-flash-lite',
+  STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
+  STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
+  // Single-clinic app, prices are stored as plain decimal numbers (not cents)
+  // on Service.price — Stripe wants the smallest currency unit, so this is
+  // the one place that gets multiplied up when building a Checkout Session.
+  STRIPE_CURRENCY: process.env.STRIPE_CURRENCY || 'usd',
 };

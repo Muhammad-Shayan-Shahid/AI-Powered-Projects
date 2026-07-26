@@ -41,8 +41,11 @@ export default function DoctorDashboard() {
     appointments,
     isLoadingAppointments,
     appointmentsError,
+    completingIds,
+    completeError,
     fetchDoctorStats,
     fetchDoctorAppointments,
+    completeAppointment,
   } = useDoctor();
 
   useEffect(() => {
@@ -104,6 +107,7 @@ export default function DoctorDashboard() {
           </div>
 
           {appointmentsError && <FormAlert>{appointmentsError}</FormAlert>}
+          {completeError && <FormAlert>{completeError}</FormAlert>}
 
           {isLoadingAppointments && <p className="text-sm text-ink-secondary">Loading schedule…</p>}
 
@@ -122,6 +126,16 @@ export default function DoctorDashboard() {
                     <div className="text-[0.8125rem] text-ink-secondary">{appt.serviceId?.name}</div>
                   </div>
                   <Badge status={appt.status} />
+                  {appt.status === 'confirmed' && (
+                    <button
+                      type="button"
+                      onClick={() => completeAppointment(appt._id)}
+                      disabled={completingIds.includes(appt._id)}
+                      className="rounded-full bg-clinician px-4 py-2 text-xs font-bold text-white transition-all duration-150 ease-in-out hover:bg-clinician-hover active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {completingIds.includes(appt._id) ? 'Marking…' : 'Mark completed'}
+                    </button>
+                  )}
                 </div>
               ))}
             </div>

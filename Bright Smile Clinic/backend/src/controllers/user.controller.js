@@ -1,4 +1,5 @@
 const User = require('../models/user.model');
+const Service = require('../models/service.model');
 const { sanitizeUser } = require('./auth.controller');
 const { uploadToImageKit } = require('../services/upload.service');
 
@@ -33,4 +34,28 @@ async function updateDoctorProfile(req, res, next) {
   }
 }
 
-module.exports = { updateDoctorProfile };
+// Full replace of the doctor's own "services offered" list — every id must
+// reference a real Service (never trust client-supplied ids blindly) or the
+// public doctor directory's ?service= filter and profile tags would end up
+// pointing at nothing.
+async function updateDoctorServices(req, res, next) {
+  try {
+    const { services } = req.body;
+
+    if (services.length > 0) {
+      const existingCount = await Service.countDocuments({ _id: { $in: services } });
+      if (existingCount !== new Set(services).size) {
+        return res.status(400).json({ success: false, data: null, message: 'One or more services are invalid.' });
+      }
+    }
+
+    req.user.services = services;
+    await req.user.save();
+
+    return res.status(200).json({ success: true, data: { user: sanitizeUser(req.user) }, message: 'Services updated.' });
+  } catch (error) {
+    next(error);
+  }
+}
+
+module.exports = { updateDoctorProfile, updateDoctorServices };

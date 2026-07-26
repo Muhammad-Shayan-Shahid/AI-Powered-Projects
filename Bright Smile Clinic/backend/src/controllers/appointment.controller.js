@@ -1,11 +1,13 @@
 const mongoose = require('mongoose');
 const Appointment = require('../models/appointment.model');
+const Review = require('../models/review.model');
 const bookingService = require('../services/booking.service');
 const { combineDateAndTime } = bookingService;
 const {
   notifyAppointmentCreated,
   notifyAppointmentConfirmed,
   notifyAppointmentRejected,
+  notifyAppointmentCompleted,
 } = require('../services/notification.service');
 
 // Thin HTTP wrappers around booking.service.js — the actual slot-generation
@@ -52,8 +54,21 @@ async function listMyAppointments(req, res, next) {
     const appointments = await Appointment.find({ patientId: req.user._id })
       .populate('doctorId', 'name specialization photoUrl')
       .populate('serviceId', 'name durationMinutes price')
-      .sort({ date: -1, timeSlot: -1 });
-    return res.status(200).json({ success: true, data: { appointments }, message: 'OK' });
+      .sort({ date: -1, timeSlot: -1 })
+      .lean();
+
+    // hasReview drives the "Rate this visit" prompt (only completed + unrated
+    // appointments should show it) — computed here rather than stored on the
+    // appointment itself, since Review is the single source of truth.
+    const reviewedAppointmentIds = new Set(
+      (await Review.find({ patientId: req.user._id }).select('appointmentId').lean()).map((r) => String(r.appointmentId))
+    );
+    const withReviewFlag = appointments.map((appt) => ({
+      ...appt,
+      hasReview: reviewedAppointmentIds.has(String(appt._id)),
+    }));
+
+    return res.status(200).json({ success: true, data: { appointments: withReviewFlag }, message: 'OK' });
   } catch (error) {
     next(error);
   }
@@ -141,6 +156,40 @@ async function rejectAppointment(req, res, next) {
   }
 }
 
+async function completeAppointment(req, res, next) {
+  try {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ success: false, data: null, message: 'Invalid appointment id.' });
+    }
+
+    const appointment = await Appointment.findById(id)
+      .populate('patientId', 'name email')
+      .populate('serviceId', 'name');
+    if (!appointment) {
+      return res.status(404).json({ success: false, data: null, message: 'Appointment not found.' });
+    }
+    if (String(appointment.doctorId) !== String(req.user._id)) {
+      return res.status(403).json({ success: false, data: null, message: 'You can only complete your own appointments.' });
+    }
+    if (appointment.status !== 'confirmed') {
+      return res.status(400).json({ success: false, data: null, message: 'Only confirmed appointments can be marked completed.' });
+    }
+
+    appointment.status = 'completed';
+    await appointment.save();
+
+    // Fire-and-forget: a socket failure must never break or slow this response.
+    notifyAppointmentCompleted({ appointment, doctor: req.user }).catch((error) => {
+      console.error('Failed to send appointment:completed notification', error);
+    });
+
+    return res.status(200).json({ success: true, data: { appointment }, message: 'Appointment marked completed.' });
+  } catch (error) {
+    next(error);
+  }
+}
+
 // "Patients seen" counts only encounters the doctor actually had (confirmed or
 // completed) — pending/rejected/cancelled appointments were never seen.
 async function getDoctorStats(req, res, next) {
@@ -208,6 +257,7 @@ module.exports = {
   listDoctorAppointments,
   confirmAppointment,
   rejectAppointment,
+  completeAppointment,
   getDoctorStats,
   cancelAppointment,
 };

@@ -4,6 +4,7 @@ import PublicNavbar from '../../../components/PublicNavbar';
 import Footer from '../../../components/Footer';
 import DoctorAvatar from '../../../components/DoctorAvatar';
 import Input from '../../../components/Input';
+import StarRating from '../../../components/StarRating';
 import { useBooking } from '../../booking/hooks/useBooking';
 import { getInitials } from '../../../utils/getInitials';
 import { formatDoctorName } from '../../../utils/formatDoctorName';
@@ -108,6 +109,9 @@ export default function BrowseDoctors() {
                   <div className="text-base font-bold text-ink">{formatDoctorName(doc.name)}</div>
                   <div className="mt-0.5 text-[0.8125rem] text-ink-secondary">
                     {doc.specialization || 'General dentistry'}
+                  </div>
+                  <div className="mt-2">
+                    <StarRating rating={doc.averageRating || 0} showCount={false} />
                   </div>
                 </div>
               </Link>

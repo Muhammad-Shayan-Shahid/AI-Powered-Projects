@@ -33,7 +33,9 @@ const appointmentSchema = new mongoose.Schema(
       enum: ['pending', 'confirmed', 'rejected', 'completed', 'cancelled'],
       default: 'pending',
     },
-    // Placeholder for the future Stripe deposit flow (see CLAUDE.md) — not used yet.
+    // Driven by Stripe Checkout (Phase 10): new appointments start 'pending',
+    // flip to 'paid' via the checkout.session.completed webhook. 'not_required'
+    // remains only for appointments created before this phase.
     paymentStatus: {
       type: String,
       enum: ['not_required', 'pending', 'paid'],

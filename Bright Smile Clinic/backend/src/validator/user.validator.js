@@ -1,4 +1,5 @@
 const { z } = require('zod');
+const { objectId } = require('./common');
 
 // photoUrl is no longer client-supplied — it's derived server-side from the
 // uploaded file (see upload.service.js), never accepted directly as input.
@@ -10,4 +11,10 @@ const updateDoctorProfileSchema = z.object({
   removePhoto: z.string().optional(),
 });
 
-module.exports = { updateDoctorProfileSchema };
+// Full replace of the doctor's services list (not a partial patch) — an
+// empty array is valid and means "no services listed yet".
+const updateDoctorServicesSchema = z.object({
+  services: z.array(objectId),
+});
+
+module.exports = { updateDoctorProfileSchema, updateDoctorServicesSchema };

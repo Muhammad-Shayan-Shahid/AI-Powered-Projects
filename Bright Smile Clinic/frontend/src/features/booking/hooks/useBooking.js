@@ -8,6 +8,8 @@ import {
   createAppointment,
   fetchMyAppointments,
   cancelAppointment,
+  createReview,
+  createCheckoutSession,
   clearSlots,
   clearBookingConflict,
   clearSelectedDoctor,
@@ -25,6 +27,9 @@ export function useBooking() {
     catalogError: booking.catalogError,
 
     selectedDoctor: booking.selectedDoctor,
+    doctorAverageRating: booking.doctorAverageRating,
+    doctorReviewCount: booking.doctorReviewCount,
+    doctorReviews: booking.doctorReviews,
     isLoadingDoctor: booking.isLoadingDoctor,
     doctorError: booking.doctorError,
 
@@ -43,6 +48,12 @@ export function useBooking() {
     cancelingId: booking.cancelingId,
     cancelError: booking.cancelError,
 
+    reviewingId: booking.reviewingId,
+    reviewError: booking.reviewError,
+
+    payingId: booking.payingId,
+    payError: booking.payError,
+
     fetchServices: useCallback(() => dispatch(fetchServices()), [dispatch]),
     fetchDoctors: useCallback((service) => dispatch(fetchDoctors(service)), [dispatch]),
     fetchDoctorById: useCallback((id) => dispatch(fetchDoctorById(id)), [dispatch]),
@@ -51,6 +62,8 @@ export function useBooking() {
     createAppointment: useCallback((payload) => dispatch(createAppointment(payload)), [dispatch]),
     fetchMyAppointments: useCallback(() => dispatch(fetchMyAppointments()), [dispatch]),
     cancelAppointment: useCallback((id) => dispatch(cancelAppointment(id)), [dispatch]),
+    createReview: useCallback((payload) => dispatch(createReview(payload)), [dispatch]),
+    payForAppointment: useCallback((id) => dispatch(createCheckoutSession(id)), [dispatch]),
     clearSlots: useCallback(() => dispatch(clearSlots()), [dispatch]),
     clearBookingConflict: useCallback(() => dispatch(clearBookingConflict()), [dispatch]),
   };

@@ -11,12 +11,23 @@ const userRoutes = require('./routes/user.routes');
 const adminRoutes = require('./routes/admin.routes');
 const documentRoutes = require('./routes/document.routes');
 const chatbotRoutes = require('./routes/chatbot.routes');
+const reviewRoutes = require('./routes/review.routes');
+const paymentRoutes = require('./routes/payment.routes');
+const paymentController = require('./controllers/payment.controller');
 
 const app = express();
 
 // credentials: true is required for the httpOnly auth cookie to be sent/received
 // across the frontend (Vite) <-> backend dev servers, which run on different origins.
 app.use(cors({ origin: CLIENT_URL, credentials: true }));
+
+// Stripe webhook signature verification needs the raw, unparsed request body,
+// so this route MUST be registered before express.json() below — once the
+// global JSON parser consumes the body, the raw bytes needed for the
+// signature check are gone. Every other route (including the rest of
+// payment.routes.js) is mounted after express.json() as usual.
+app.post('/api/payments/webhook', express.raw({ type: 'application/json' }), paymentController.handleWebhook);
+
 app.use(express.json());
 app.use(cookieParser());
 
@@ -34,6 +45,8 @@ app.use('/api/users', userRoutes);
 app.use('/api/admin/documents', documentRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/chatbot', chatbotRoutes);
+app.use('/api/reviews', reviewRoutes);
+app.use('/api/payments', paymentRoutes);
 
 // Catch-all for unmatched routes.
 app.use((req, res) => {

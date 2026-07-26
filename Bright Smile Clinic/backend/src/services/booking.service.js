@@ -149,7 +149,10 @@ async function bookAppointment({ patientId, doctorId, serviceId, date, timeSlot 
       date: dayStart,
       timeSlot,
       status: 'pending',
-      paymentStatus: 'not_required',
+      // Stripe Checkout (Phase 10) is now wired up — every new appointment
+      // requires payment once confirmed, so it starts 'pending' rather than
+      // the old 'not_required' placeholder default.
+      paymentStatus: 'pending',
     });
   } catch (error) {
     // Atomic safety net: the partial unique index on {doctorId, date, timeSlot}

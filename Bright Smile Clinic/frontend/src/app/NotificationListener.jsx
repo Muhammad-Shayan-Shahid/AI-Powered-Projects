@@ -8,7 +8,7 @@ import { connectSocket, disconnectSocket } from './socket';
 // doctor never listens for another doctor's confirm/reject.
 const EVENTS_BY_ROLE = {
   doctor: ['appointment:created', 'doctor:approved', 'doctor:rejected'],
-  patient: ['appointment:confirmed', 'appointment:rejected'],
+  patient: ['appointment:confirmed', 'appointment:rejected', 'appointment:completed'],
 };
 
 // App-wide socket listener: connects once a session exists, disconnects on

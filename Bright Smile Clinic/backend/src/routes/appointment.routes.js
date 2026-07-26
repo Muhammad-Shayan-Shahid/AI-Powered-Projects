@@ -14,6 +14,7 @@ router.get('/doctor', verifyToken, requireRole('doctor'), appointmentController.
 router.get('/doctor/stats', verifyToken, requireRole('doctor'), appointmentController.getDoctorStats);
 router.patch('/:id/confirm', verifyToken, requireRole('doctor'), appointmentController.confirmAppointment);
 router.patch('/:id/reject', verifyToken, requireRole('doctor'), validate(rejectAppointmentSchema), appointmentController.rejectAppointment);
+router.patch('/:id/complete', verifyToken, requireRole('doctor'), appointmentController.completeAppointment);
 router.patch('/:id/cancel', verifyToken, requireRole('patient'), appointmentController.cancelAppointment);
 
 module.exports = router;
