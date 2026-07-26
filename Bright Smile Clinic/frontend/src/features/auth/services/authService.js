@@ -1,4 +1,7 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+// Relative path: frontend and backend share the same origin in production
+// (single Render service), and Vite's dev proxy forwards /api locally (see
+// vite.config.js) — VITE_API_URL only needs to be set if that ever changes.
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 // Thin wrapper around fetch that always sends the httpOnly auth cookie and
 // normalizes the backend's { success, data, message } response shape into

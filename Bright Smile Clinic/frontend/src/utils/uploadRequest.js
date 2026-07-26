@@ -1,4 +1,5 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+// Relative path: same-origin in production, proxied by Vite locally (see vite.config.js).
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 // Multipart file upload helper built on XHR rather than fetch — fetch has no
 // upload progress event, and onProgress needs the real bytes-sent count to

@@ -1,2 +1,4 @@
 node_modules/
 .env
+# Generated on every deploy by the root "build" script (copies frontend/dist here) — never commit a stale copy.
+public/

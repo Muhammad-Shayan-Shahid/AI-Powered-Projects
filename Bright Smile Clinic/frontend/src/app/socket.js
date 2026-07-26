@@ -1,7 +1,13 @@
 import { io } from 'socket.io-client';
 
-// Reuses the same host as the REST API, just without the /api suffix.
-const SOCKET_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3000/api').replace(/\/api\/?$/, '');
+// Reuses the same host as the REST API, just without the /api suffix. When
+// VITE_API_URL isn't set, leave this undefined so socket.io-client connects
+// to same-origin (window.location) — correct in production (single Render
+// service) and locally, where Vite's dev proxy forwards the /socket.io
+// handshake to the backend (see vite.config.js) so no host needs hardcoding.
+const SOCKET_URL = import.meta.env.VITE_API_URL
+  ? import.meta.env.VITE_API_URL.replace(/\/api\/?$/, '')
+  : undefined;
 
 let socket = null;
 

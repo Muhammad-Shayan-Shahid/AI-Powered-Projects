@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const { CLIENT_URL } = require('./config/config');
@@ -48,7 +49,23 @@ app.use('/api/chatbot', chatbotRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/payments', paymentRoutes);
 
-// Catch-all for unmatched routes.
+// Single combined deployment: this Express server also serves the built React
+// app so only one Render service is needed. This MUST come after every /api
+// route above — express.static/the SPA catch-all below only run once none of
+// the API routes matched, so they can never shadow a real API response.
+const frontendBuildPath = path.join(__dirname, '..', 'public');
+app.use(express.static(frontendBuildPath));
+
+// Anything else that isn't an /api/* call is a client-side route (React
+// Router) — serve index.html and let the browser router take over, so a hard
+// refresh/direct URL visit on e.g. /booking/my-appointments works instead of
+// 404ing. Excludes /api so unmatched API routes still fall through to the
+// JSON 404 handler below instead of getting index.html back.
+app.get(/^\/(?!api(?:\/|$)).*/, (req, res) => {
+  res.sendFile(path.join(frontendBuildPath, 'index.html'));
+});
+
+// Catch-all for unmatched routes (only reachable for unmatched /api/* calls now).
 app.use((req, res) => {
   res.status(404).json({ success: false, data: null, message: 'Route not found.' });
 });

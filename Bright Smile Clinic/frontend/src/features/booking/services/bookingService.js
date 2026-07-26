@@ -1,4 +1,5 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+// Relative path: same-origin in production, proxied by Vite locally (see vite.config.js).
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 // Mirrors authService's request wrapper: always sends the httpOnly auth
 // cookie and normalizes the backend's { success, data, message } shape into

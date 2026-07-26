@@ -1,4 +1,5 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+// Relative path: same-origin in production, proxied by Vite locally (see vite.config.js).
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 // Same request/error-normalization pattern as authService.js — public endpoint,
 // but credentials stay included for consistency with every other service call.
