@@ -2,6 +2,19 @@
 // Import this instead of using process.env directly elsewhere in the app.
 require('dotenv').config({ quiet: true }); // quiet: suppress dotenv's random console "tip" ads
 
+// CLIENT_URL drives Stripe's success/cancel redirect, CORS, and Socket.io's
+// CORS origin — all three go silently wrong (Stripe redirects to a dev URL,
+// or same-origin requests get rejected) if it's unset in production and
+// falls back to the localhost dev default below, so that fallback is only
+// safe for local dev. Warn loudly instead of failing silently in that case.
+if (process.env.NODE_ENV === 'production' && !process.env.CLIENT_URL) {
+  console.warn(
+    'WARNING: CLIENT_URL is not set in production — falling back to ' +
+    'http://localhost:5173. Stripe redirects, CORS, and Socket.io will ' +
+    "break. Set CLIENT_URL to this app's real deployed URL."
+  );
+}
+
 module.exports = {
   PORT: process.env.PORT,
   MONGO_URI: process.env.MONGO_URI,
