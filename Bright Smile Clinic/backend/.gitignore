@@ -1,4 +1,4 @@
 node_modules/
 .env
-# Manually built + copied from frontend/dist before each deploy — never commit a stale copy.
-public/
+
+
