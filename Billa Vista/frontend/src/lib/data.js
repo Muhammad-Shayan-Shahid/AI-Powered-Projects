@@ -397,6 +397,56 @@ export const liveOrders = [
   },
 ]
 
+export const testimonials = [
+  {
+    id: 'review-1',
+    name: 'Amara Osei',
+    role: 'Regular Diner',
+    avatar: img('photo-1633332755192-727a05c4013d'),
+    rating: 5,
+    quote:
+      'The AI booking made reserving a table effortless — picked our seating preference and had us seated in under a minute. Food arrived exactly when promised.',
+  },
+  {
+    id: 'review-2',
+    name: 'Liam Chen',
+    role: 'Food Blogger',
+    avatar: img('photo-1519345182560-3f2917c472ef'),
+    rating: 5,
+    quote:
+      'Bella Vista nails the balance of comfort food and craft. The Signature Stack is the best burger I have had this year, hands down.',
+  },
+  {
+    id: 'review-3',
+    name: 'Sofia Reyes',
+    role: 'Local Guide',
+    avatar: img('photo-1573497019940-1c28c88b4f3e'),
+    rating: 4,
+    quote:
+      'Loved the outdoor seating and how fast the AI concierge responded to our special requests. Will be back for the truffle pasta again.',
+  },
+  {
+    id: 'review-4',
+    name: 'Noah Williams',
+    role: 'First-Time Visitor',
+    avatar: img('photo-1607746882042-944635dfe10e'),
+    rating: 5,
+    quote:
+      'Zero wait time, exactly as advertised. Walked in for our reservation and the table was ready with water already poured.',
+  },
+]
+
+export const contactInfo = {
+  address: '128 Harborview Lane, San Francisco, CA 94111',
+  phone: '+1 (415) 555-0192',
+  email: 'hello@bellavista.com',
+  hours: [
+    { day: 'Mon – Thu', time: '11:00 AM – 10:00 PM' },
+    { day: 'Fri – Sat', time: '11:00 AM – 11:30 PM' },
+    { day: 'Sunday', time: '10:00 AM – 9:00 PM' },
+  ],
+}
+
 export const currentUser = {
   name: 'Alex Morgan',
   role: 'Store Manager',

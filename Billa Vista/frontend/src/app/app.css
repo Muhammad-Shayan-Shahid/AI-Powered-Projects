@@ -26,3 +26,16 @@
     scrollbar-width: none;
   }
 }
+
+/* Sonner's built-in richColors ship a green success palette — override to match the app's amber/gold theme. */
+[data-sonner-toaster][data-theme='dark'] {
+  --success-bg: hsl(32, 90%, 8%) !important;
+  --success-border: hsl(32, 80%, 18%) !important;
+  --success-text: hsl(38, 95%, 65%) !important;
+}
+
+[data-sonner-toaster][data-theme='light'] {
+  --success-bg: hsl(45, 100%, 95%) !important;
+  --success-border: hsl(42, 90%, 82%) !important;
+  --success-text: hsl(28, 85%, 32%) !important;
+}

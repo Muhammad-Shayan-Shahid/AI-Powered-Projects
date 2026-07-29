@@ -16,7 +16,7 @@ export default {
         surface: '#161b22',
         border: '#21262d',
         primary: {
-          DEFAULT: '#1D9E75',
+          DEFAULT: '#D97706',
           foreground: '#ffffff',
         },
         muted: {

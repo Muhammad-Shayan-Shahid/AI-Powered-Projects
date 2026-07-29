@@ -1,10 +1,22 @@
-import { useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowUpRight, Star, Clock, ChevronLeft, ChevronRight, Plus } from 'lucide-react'
+import {
+  ArrowUpRight,
+  Star,
+  Clock,
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+  Quote,
+  MapPin,
+  Phone,
+  Mail,
+  Send,
+} from 'lucide-react'
 import { toast } from 'sonner'
-import { menuItems, featuredDish } from '@/lib/data'
-import { formatCurrency } from '@/lib/utils'
+import { menuItems, featuredDish, testimonials, contactInfo } from '@/lib/data'
+import { formatCurrency, cn } from '@/lib/utils'
 import { useCart } from '@/features/cart/hooks/useCart'
 
 const avatarSeeds = [
@@ -16,6 +28,17 @@ const avatarSeeds = [
 export default function HomePage() {
   const scrollerRef = useRef(null)
   const { addToCart } = useCart()
+  const { hash } = useLocation()
+  const [contactForm, setContactForm] = useState({ name: '', email: '', message: '' })
+
+  useEffect(() => {
+    if (!hash) return
+    const target = document.querySelector(hash)
+    if (target) {
+      const timer = setTimeout(() => target.scrollIntoView({ behavior: 'smooth' }), 350)
+      return () => clearTimeout(timer)
+    }
+  }, [hash])
 
   const scroll = (direction) => {
     scrollerRef.current?.scrollBy({ left: direction * 320, behavior: 'smooth' })
@@ -24,6 +47,12 @@ export default function HomePage() {
   const handleAddToCart = (item) => {
     addToCart({ id: item.id, name: item.name, price: item.price, image: item.image })
     toast.success(`${item.name} added to cart`)
+  }
+
+  const handleContactSubmit = (e) => {
+    e.preventDefault()
+    toast.success("Message sent! We'll get back to you shortly.")
+    setContactForm({ name: '', email: '', message: '' })
   }
 
   return (
@@ -200,6 +229,188 @@ export default function HomePage() {
               </div>
             </motion.div>
           ))}
+        </div>
+      </section>
+
+      <section id="reviews" className="container scroll-mt-24 py-16">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-40px' }}
+          transition={{ duration: 0.5 }}
+          className="mx-auto max-w-2xl text-center"
+        >
+          <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-medium text-primary">
+            <Star className="h-3 w-3 fill-current" /> What Guests Say
+          </span>
+          <h2 className="mt-5 text-3xl font-extrabold sm:text-4xl">
+            Loved by <span className="text-primary">2,350+</span> Diners
+          </h2>
+          <p className="mt-3 text-muted">Real reviews from real tables.</p>
+        </motion.div>
+
+        <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {testimonials.map((review, idx) => (
+            <motion.div
+              key={review.id}
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ duration: 0.4, delay: idx * 0.08 }}
+              className="flex flex-col rounded-2xl border border-border bg-surface p-6"
+            >
+              <Quote className="h-5 w-5 text-primary" />
+              <p className="mt-3 flex-1 text-sm text-muted">{review.quote}</p>
+              <div className="mt-4 flex items-center gap-1 text-accent-orange">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star
+                    key={i}
+                    className={cn('h-3.5 w-3.5', i < review.rating ? 'fill-current' : 'text-muted/30')}
+                  />
+                ))}
+              </div>
+              <div className="mt-4 flex items-center gap-3">
+                <img
+                  src={review.avatar}
+                  alt={review.name}
+                  className="h-10 w-10 rounded-full object-cover"
+                />
+                <div>
+                  <p className="text-sm font-semibold">{review.name}</p>
+                  <p className="text-xs text-muted">{review.role}</p>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      <section id="contact" className="container scroll-mt-24 py-16">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-40px' }}
+          transition={{ duration: 0.5 }}
+          className="mx-auto max-w-2xl text-center"
+        >
+          <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-medium text-primary">
+            <Mail className="h-3 w-3" /> Get in Touch
+          </span>
+          <h2 className="mt-5 text-3xl font-extrabold sm:text-4xl">
+            Contact <span className="text-primary">Us</span>
+          </h2>
+          <p className="mt-3 text-muted">Questions, feedback, or private events — we'd love to hear from you.</p>
+        </motion.div>
+
+        <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-40px' }}
+            transition={{ duration: 0.4 }}
+            className="space-y-4"
+          >
+            <div className="flex items-start gap-4 rounded-2xl border border-border bg-surface p-5">
+              <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-primary/15">
+                <MapPin className="h-4 w-4 text-primary" />
+              </span>
+              <div>
+                <p className="text-sm font-semibold">Visit Us</p>
+                <p className="mt-1 text-sm text-muted">{contactInfo.address}</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4 rounded-2xl border border-border bg-surface p-5">
+              <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-primary/15">
+                <Phone className="h-4 w-4 text-primary" />
+              </span>
+              <div>
+                <p className="text-sm font-semibold">Call Us</p>
+                <p className="mt-1 text-sm text-muted">{contactInfo.phone}</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4 rounded-2xl border border-border bg-surface p-5">
+              <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-primary/15">
+                <Mail className="h-4 w-4 text-primary" />
+              </span>
+              <div>
+                <p className="text-sm font-semibold">Email Us</p>
+                <p className="mt-1 text-sm text-muted">{contactInfo.email}</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4 rounded-2xl border border-border bg-surface p-5">
+              <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-primary/15">
+                <Clock className="h-4 w-4 text-primary" />
+              </span>
+              <div className="w-full">
+                <p className="text-sm font-semibold">Opening Hours</p>
+                <div className="mt-1 space-y-1">
+                  {contactInfo.hours.map((slot) => (
+                    <div key={slot.day} className="flex justify-between text-sm text-muted">
+                      <span>{slot.day}</span>
+                      <span>{slot.time}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.form
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-40px' }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+            onSubmit={handleContactSubmit}
+            className="rounded-2xl border border-border bg-surface p-6"
+          >
+            <div>
+              <label className="text-sm font-medium">Name</label>
+              <input
+                required
+                value={contactForm.name}
+                onChange={(e) => setContactForm((prev) => ({ ...prev, name: e.target.value }))}
+                placeholder="Your name"
+                className="mt-2 min-h-[44px] w-full rounded-xl border border-border bg-background px-4 text-sm outline-none focus:border-primary"
+              />
+            </div>
+
+            <div className="mt-5">
+              <label className="text-sm font-medium">Email</label>
+              <input
+                required
+                type="email"
+                value={contactForm.email}
+                onChange={(e) => setContactForm((prev) => ({ ...prev, email: e.target.value }))}
+                placeholder="you@example.com"
+                className="mt-2 min-h-[44px] w-full rounded-xl border border-border bg-background px-4 text-sm outline-none focus:border-primary"
+              />
+            </div>
+
+            <div className="mt-5">
+              <label className="text-sm font-medium">Message</label>
+              <textarea
+                required
+                rows={4}
+                value={contactForm.message}
+                onChange={(e) => setContactForm((prev) => ({ ...prev, message: e.target.value }))}
+                placeholder="How can we help?"
+                className="mt-2 w-full resize-none rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none focus:border-primary"
+              />
+            </div>
+
+            <motion.button
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.97 }}
+              type="submit"
+              className="mt-6 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full bg-primary py-3 text-sm font-semibold text-white"
+            >
+              Send Message
+              <Send className="h-4 w-4" />
+            </motion.button>
+          </motion.form>
         </div>
       </section>
     </main>
